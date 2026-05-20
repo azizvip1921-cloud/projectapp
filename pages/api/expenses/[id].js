@@ -1,0 +1,29 @@
+import data from "@/lib/data";
+
+export default async function handler(req, res) {
+  const { id } = req.query;
+
+  if (req.method === "PUT") {
+    try {
+      const { employee_name, category, amount, date, description, status } = req.body;
+      await data.query(
+        "UPDATE expenses SET employee_name=?, category=?, amount=?, date=?, description=?, status=? WHERE id=?",
+        [employee_name, category || "Travel", Number(amount || 0), date, description || null, status || "Pending", id]
+      );
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("database error:", error);
+      res.status(500).json({ success: false, message: "error updating expense", error: error.message });
+    }
+  } else if (req.method === "DELETE") {
+    try {
+      await data.query("DELETE FROM expenses WHERE id=?", [id]);
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("database error:", error);
+      res.status(500).json({ success: false, message: "error deleting expense", error: error.message });
+    }
+  } else {
+    res.status(405).json({ message: "method not allowed" });
+  }
+}

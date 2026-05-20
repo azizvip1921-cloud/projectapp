@@ -1,0 +1,8 @@
+body { font-family: Arial, sans-serif; padding: 40px; color: #1e293b; }
+h1 { font-size: 22px; margin-bottom: 4px; }
+.sub { color: #64748b; font-size: 13px; margin-bottom: 28px; }
+table { border-collapse: collapse; width: 100%; margin-top: 16px; }
+td { padding: 10px 14px; border: 1px solid #e2e8f0; font-size: 13px; }
+td:first-child { font-weight: 600; background: #f8fafc; width: 150px; }
+@media print { button { display: none; } }
+.print-btn { padding: 8px 18px; background: #1D4ED8; color: #fff; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }

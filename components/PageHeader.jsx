@@ -237,7 +237,11 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
     } catch {}
   };
 
-  useEffect(() => { fetchHrManager(); }, []);
+  useEffect(() => {
+    fetchHrManager();
+    router.events.on("routeChangeComplete", fetchHrManager);
+    return () => { router.events.off("routeChangeComplete", fetchHrManager); };
+  }, []);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});

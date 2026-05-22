@@ -1,5 +1,4 @@
 import mysql from 'mysql2/promise';
-import bcrypt from 'bcryptjs';
 
 const conn = await mysql.createConnection({
   host: 'blvehbvuyh2tqryjbaet-mysql.services.clever-cloud.com',
@@ -195,10 +194,6 @@ if (wd[0].cnt === 0) {
     await conn.query("INSERT INTO working_days (day_name, is_working) VALUES (?, ?)", [day, day === "Friday" ? 0 : 1]);
   }
 }
-
-const hashed = await bcrypt.hash('admin123', 10);
-await conn.query("INSERT INTO users (name, email, role, password) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE password=VALUES(password)",
-  ['Admin', 'admin@admin.com', 'Admin', hashed]);
 
 console.log('✓ All done — project-app database ready on Clever Cloud');
 await conn.end();

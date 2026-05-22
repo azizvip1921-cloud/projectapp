@@ -171,6 +171,19 @@ export default async function handler(req, res) {
         });
       }
 
+      // چێک بکە تۆماری ئامادەبوونی ئەمڕۆ بۆ ئەم کارمەندە بوونی نەبێت
+      const [dupRows] = await data.query(
+        "SELECT id FROM attendance WHERE employee_name = ? AND DATE(date) = ? LIMIT 1",
+        [employee_name, checkDate]
+      );
+      if (dupRows.length > 0) {
+        return res.status(409).json({
+          success: false,
+          duplicate: true,
+          message: "Attendance already recorded for this employee today",
+        });
+      }
+
       await data.query(
         "INSERT INTO attendance (employee_name, date, check_in, check_out, status) VALUES (?, ?, ?, ?, ?)",
         [employee_name, checkDate, check_in || null, check_out || null, status]

@@ -215,10 +215,11 @@ function WeekPicker({ filterDate, setFilterDate }) {
 
 function FaceScanner({ mode, employees, onClose, fetchRecords }) {
   const { t } = useLanguage();
-  const videoRef  = useRef(null);
-  const streamRef = useRef(null);
-  const loopRef   = useRef(null);
-  const phaseRef  = useRef("init");
+  const videoRef     = useRef(null);
+  const streamRef    = useRef(null);
+  const loopRef      = useRef(null);
+  const phaseRef     = useRef("init");
+  const matchingRef  = useRef(false);
 
   const [phase,    setPhase]    = useState("init");
   const [errorMsg, setErrorMsg] = useState("");
@@ -314,6 +315,8 @@ function FaceScanner({ mode, employees, onClose, fetchRecords }) {
   };
 
   const doMatch = async (descriptor) => {
+    if (matchingRef.current) return;
+    matchingRef.current = true;
     updatePhase("matching");
     try {
       const res  = await fetch("/api/face", {
@@ -345,6 +348,7 @@ function FaceScanner({ mode, employees, onClose, fetchRecords }) {
       updatePhase("success");
       fetchRecords();
     } catch (e) { showError(t.att_face_err_match + e.message); }
+    finally { matchingRef.current = false; }
   };
 
   const recordAttendance = async (emp, todayRec) => {
@@ -360,8 +364,9 @@ function FaceScanner({ mode, employees, onClose, fetchRecords }) {
       });
       if (res.status === 409) {
         const body = await res.json();
-        if (body.on_leave) return { action: "on_leave", status: null };
-        if (body.day_off)  return { action: "day_off",  status: null };
+        if (body.on_leave)  return { action: "on_leave",    status: null };
+        if (body.day_off)   return { action: "day_off",     status: null };
+        if (body.duplicate) return { action: "already_done", status: null };
       }
       return { action: "check_in", status: autoStatus };
     }

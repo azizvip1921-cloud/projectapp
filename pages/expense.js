@@ -143,13 +143,15 @@ export default function Expenses() {
     <>
       {/* Always visible header */}
       <div className="hr-ph">
-        <div>
+        <div className="ph-title-group">
           <div className="hr-pt">{t.exp_title}</div>
           <div className="hr-ps">{t.exp_claims_sub(records.length)}</div>
         </div>
-        <div className="exp-header-actions">
+        <div className="ph-main-actions">
           <input type="month" value={filterDate} onChange={e => setFilterDate(e.target.value)} className="exp-month-input" />
           <button className="btn-print" onClick={() => window.print()} title="Print"><Printer size={13} /> Print</button>
+        </div>
+        <div className="ph-extra-actions">
           <button className="hr-btn" onClick={() => { resetForm(); setShowForm(true); }}><Plus size={13} /> {t.exp_btn}</button>
         </div>
       </div>

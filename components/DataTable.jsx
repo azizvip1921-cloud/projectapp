@@ -18,7 +18,7 @@ import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-r
 
 const SIZE_OPTIONS = [10, 25, 50, 100];
 
-export default function DataTable({ columns, data, renderRow, renderCard, viewMode = "table", itemLabel = "records", toolbar, viewToggle }) {
+export default function DataTable({ columns, data, renderRow, renderCard, viewMode = "table", itemLabel = "records", toolbar, filterSlot, viewToggle }) {
   const [page, setPage]         = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -44,10 +44,11 @@ export default function DataTable({ columns, data, renderRow, renderCard, viewMo
   return (
     <div className="flex flex-col gap-3">
 
-      {/* ── Top bar: toolbar (left) + rows per page (right) ── */}
-      <div className="flex items-center gap-2">
-        <div className="flex-1 min-w-0">{toolbar}</div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+      {/* ── Top bar ── */}
+      <div className="dt-topbar">
+        <div className="dt-toolbar">{toolbar}</div>
+        {filterSlot && <div className="dt-filter">{filterSlot}</div>}
+        <div className="dt-perpage">
           {viewToggle}
           <span className="text-sm text-muted-foreground">per page</span>
           <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>

@@ -4,7 +4,9 @@
       "Bash(npm run:*)",
       "PowerShell(\\(Get-Content \"c:\\\\Users\\\\dell\\\\projectapp\\\\styles\\\\globals.css\"\\).Count)",
       "PowerShell(winget install Cloudflare.cloudflared --source winget 2>&1)",
-      "PowerShell(cloudflared tunnel --url http://localhost:3000 2>&1 | Tee-Object -FilePath \"$env:TEMP\\\\cf_tunnel.log\")"
+      "PowerShell(cloudflared tunnel --url http://localhost:3000 2>&1 | Tee-Object -FilePath \"$env:TEMP\\\\cf_tunnel.log\")",
+      "Bash(clever curl *)",
+      "Bash(clever logs *)"
     ]
   }
 }

@@ -26,7 +26,7 @@ export default function App({ Component, pageProps }) {
                 <PageHeader alwaysShow />
                 <Component {...pageProps} />
               </SidebarInset>
-              <Toaster position="top-right" richColors />
+              <Toaster position="top-center" richColors closeButton />
             </FormVisibilityProvider>
           </SidebarProvider>
         </TooltipProvider>

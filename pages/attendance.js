@@ -145,6 +145,7 @@ function WeekPicker({ filterDate, setFilterDate }) {
   const { lang } = useLanguage();
   const i18n = WEEK_I18N[lang] || WEEK_I18N.en;
   const today = localToday();
+  const selectedBtnRef = useRef(null);
 
   const offsetDate = (base, n) => {
     const d = new Date(base + "T00:00:00");
@@ -181,6 +182,12 @@ function WeekPicker({ filterDate, setFilterDate }) {
     return `${String(d.getDate()).padStart(2,"0")} ${i18n.months[d.getMonth()]}`;
   };
 
+  useEffect(() => {
+    if (selectedBtnRef.current) {
+      selectedBtnRef.current.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [filterDate, anchor]);
+
   return (
     <div className="att-week-picker">
       <button onClick={() => shift(-1)} disabled={!canGoBack} className="att-week-nav-btn"
@@ -189,7 +196,7 @@ function WeekPicker({ filterDate, setFilterDate }) {
         {days.map((ds) => {
           const sel = filterDate === ds;
           return (
-            <button key={ds} onClick={() => setFilterDate(ds)} title={ds} className="att-week-day-btn"
+            <button key={ds} ref={sel ? selectedBtnRef : null} onClick={() => setFilterDate(ds)} title={ds} className="att-week-day-btn"
               style={{ background: sel ? "#1D4ED8" : "transparent", color: sel ? "#fff" : "var(--hr-text)", fontWeight: sel ? 700 : 500 }}>
               {getDayLabel(ds)}
             </button>
@@ -633,16 +640,18 @@ function AttendanceManagementTab() {
   return (
     <>
       <div className="hr-ph">
-        <div>
+        <div className="ph-title-group">
           <div className="hr-pt">{t.att_title}</div>
           <div className="hr-ps">{t.att_sub}</div>
         </div>
-        <div className="att-header-controls">
+        <div className="ph-main-actions">
           <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)} className="att-date-input" />
           <button className="face-id-btn" onClick={() => setFaceMode("scan")}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             {t.att_face_btn_scan}
           </button>
+        </div>
+        <div className="ph-extra-actions">
           <button className="face-id-btn-reg" onClick={() => setFaceMode("register")}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             {t.att_face_btn_reg}

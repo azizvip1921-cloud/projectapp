@@ -39,6 +39,8 @@ export default function Documents() {
   const [search, setSearch] = useState("");
   const [empFilter, setEmpFilter] = useState("All");
   const [showEmpList, setShowEmpList] = useState(false);
+  const filterBtnRef = useRef(null);
+  const [filterPos, setFilterPos] = useState(null);
   const [file, setFile] = useState(null);
   const [dragging, setDragging] = useState(false);
   const fileInputRef = useRef(null);
@@ -203,44 +205,59 @@ export default function Documents() {
 
         <DataTable columns={columns} data={filtered} itemLabel="documents"
           toolbar={
-            <div className="docs-toolbar">
-              <div className="docs-search-wrap">
-                <Search className="docs-search-icon" />
-                <input
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder={t.docs_ph_search}
-                  className="emp-search"
-                />
-              </div>
-              <div className="docs-filter-wrap">
-                <button
-                  className="emp-filter-btn"
-                  onClick={() => setShowEmpList(v => !v)}
+            <div className="docs-search-wrap">
+              <Search className="docs-search-icon" />
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder={t.docs_ph_search}
+                className="emp-search"
+              />
+            </div>
+          }
+          filterSlot={
+            <div className="docs-filter-wrap" ref={filterBtnRef}>
+              <button
+                className="emp-filter-btn"
+                onClick={() => {
+                  if (!showEmpList && filterBtnRef.current && window.innerWidth <= 640) {
+                    const r = filterBtnRef.current.getBoundingClientRect();
+                    const isRtl = document.documentElement.dir === "rtl";
+                    setFilterPos(isRtl
+                      ? { top: r.bottom + 4, right: window.innerWidth - r.right, maxH: window.innerHeight - r.bottom - 12 }
+                      : { top: r.bottom + 4, left: r.left, maxH: window.innerHeight - r.bottom - 12 }
+                    );
+                  } else {
+                    setFilterPos(null);
+                  }
+                  setShowEmpList(v => !v);
+                }}
+              >
+                {empFilter === "All" ? t.docs_all_emp : empFilter}
+                <span style={{ fontSize: 10, opacity: 0.6 }}>{showEmpList ? "▴" : "▾"}</span>
+              </button>
+              {showEmpList && (
+                <div
+                  className={`docs-dropdown${filterPos ? " docs-dropdown--fixed" : ""}`}
+                  style={filterPos ? { top: filterPos.top, ...(filterPos.right !== undefined ? { right: filterPos.right } : { left: filterPos.left }), maxHeight: filterPos.maxH } : {}}
                 >
-                  {empFilter === "All" ? t.docs_all_emp : empFilter}
-                  <span style={{ fontSize: 10, opacity: 0.6 }}>{showEmpList ? "▴" : "▾"}</span>
-                </button>
-                {showEmpList && (
-                  <div className="docs-dropdown">
-                    <div
-                      onClick={() => { setEmpFilter("All"); setShowEmpList(false); }}
-                      className={`docs-dropdown-item docs-dropdown-item--border${empFilter === "All" ? " docs-dropdown-item--active" : ""}`}
-                    >
-                      {t.docs_all_emp}
-                    </div>
-                    {empNames.slice(1).map(emp => (
-                      <div
-                        key={emp}
-                        onClick={() => { setEmpFilter(emp); setShowEmpList(false); }}
-                        className={`docs-dropdown-item${empFilter === emp ? " docs-dropdown-item--active" : ""}`}
-                      >
-                        {emp}
-                      </div>
-                    ))}
+                  <div
+                    onClick={() => { setEmpFilter("All"); setShowEmpList(false); setFilterPos(null); }}
+                    className={`docs-dropdown-item docs-dropdown-item--border${empFilter === "All" ? " docs-dropdown-item--active" : ""}`}
+                  >
+                    {t.docs_all_emp}
                   </div>
-                )}
-              </div>
+                  {empNames.slice(1).map(emp => (
+                    <div
+                      key={emp}
+                      onClick={() => { setEmpFilter(emp); setShowEmpList(false); setFilterPos(null); }}
+                      className={`docs-dropdown-item${empFilter === emp ? " docs-dropdown-item--active" : ""}`}
+                    >
+                      {emp}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           }
           renderRow={(doc, index) => (

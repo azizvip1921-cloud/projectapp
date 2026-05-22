@@ -145,11 +145,11 @@ export default function AttendanceRecords() {
     <>
       {/* ── Page Header ── */}
       <div className="hr-ph">
-        <div>
+        <div className="ph-title-group">
           <div className="hr-pt">{t.rec_title}</div>
           <div className="hr-ps">{t.rec_sub}</div>
         </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <div className="ph-main-actions">
           <select
             value={selMonth}
             onChange={e => setSelMonth(Number(e.target.value))}

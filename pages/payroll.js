@@ -164,11 +164,11 @@ function PayrollManagementTab() {
     <>
       {/* Header */}
       <div className="hr-ph">
-        <div>
+        <div className="ph-title-group">
           <div className="hr-pt">{t.pay_title}</div>
           <div className="hr-ps">{new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}</div>
         </div>
-        <div className="pay-header-actions">
+        <div className="ph-main-actions">
           <input
             type="month"
             value={filterDate}
@@ -176,6 +176,8 @@ function PayrollManagementTab() {
             className="pay-month-input"
           />
           <button className="btn-print" onClick={() => window.print()} title="Print"><Printer size={13} /> Print</button>
+        </div>
+        <div className="ph-extra-actions">
           <button className="hr-btn" onClick={() => { resetForm(); setShowForm(true); }}><Plus size={13} /> {t.pay_btn_add}</button>
         </div>
       </div>

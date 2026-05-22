@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
 import { Sun, Moon, Globe, User, LogOut, ChevronDown, KeyRound, Bell, Calendar, FileText, DollarSign, Search, Users, ClipboardList, Briefcase, CreditCard, TrendingUp, ShieldCheck, Clock, FileCheck, Settings, Wallet, Building2, Palette, Database, Wifi, CalendarDays, File, LayoutDashboard, Inbox, Receipt, CalendarOff } from "lucide-react";
@@ -48,6 +49,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const notifRef = useRef(null);
+  const seenNotifIds = useRef(null);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -142,6 +144,21 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
           payroll.filter(p => p.status === "Pending").forEach(p =>
             notifs.push({ id: `pay-${p.id}`, type: "payroll", title: p.employee_name, sub: p.month, href: "/payroll" })
           );
+
+        if (seenNotifIds.current === null) {
+          seenNotifIds.current = new Set(notifs.map(n => n.id));
+        } else {
+          notifs.forEach(n => {
+            if (!seenNotifIds.current.has(n.id)) {
+              toast(n.title, {
+                description: n.sub,
+                action: { label: t.lbl_view || "View", onClick: () => router.push(n.href) },
+              });
+            }
+          });
+          seenNotifIds.current = new Set(notifs.map(n => n.id));
+        }
+
         setNotifications(notifs);
       } catch {}
     };

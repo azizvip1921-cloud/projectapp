@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useFormVisibility } from "@/components/FormVisibilityContext";
 import { toast } from "sonner";
-import { Plus, Printer } from "lucide-react";
+import { Plus, FileText } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -27,7 +27,7 @@ function Badge({ text, cfg }) {
 const getInitials = (name) => { if (!name) return "?"; return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2); };
 
 export default function Contracts() {
-  const { t, tv } = useLanguage();
+  const { t, tv, lang } = useLanguage();
   const [records, setRecords] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [employee_name, setEmployee_name] = useState("");
@@ -54,7 +54,7 @@ export default function Contracts() {
       await fetch(`/api/contracts/${rec.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ employee_name: rec.employee_name, department: rec.department, contract_type: rec.contract_type, start_date: rec.start_date, end_date: rec.end_date, salary: rec.salary, status: "Inactive" }) });
       const emp = allEmployees.find(e => e.employee_name === rec.employee_name);
       if (emp) await fetch(`/api/employee/${emp.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "Inactive" }) });
-      toast.warning(`⚠️ ${rec.employee_name} — Contract xlas bûye û bûye Inactive`, { duration: 8000 });
+      toast.warning(t.cont_expired_toast(rec.employee_name), { duration: 8000 });
     }
     if (expired.length > 0) {
       const res = await fetch("/api/contracts");
@@ -115,6 +115,76 @@ export default function Contracts() {
   const stats = { total: records.length, active: records.filter(r => r.status === "Active").length, inactive: records.filter(r => r.status === "Inactive").length, onLeave: records.filter(r => r.status === "On Leave").length, suspended: records.filter(r => r.status === "Suspended").length, permanent: records.filter(r => r.contract_type === "Permanent").length, temporary: records.filter(r => r.contract_type === "Temporary").length };
   const filtered = filter === "All" ? records : records.filter(r => r.status === filter);
 
+  const printContract = (rec) => {
+    const isRTL = lang === "ku" || lang === "ar";
+    const dir = isRTL ? "rtl" : "ltr";
+    const fontFamily = isRTL ? "'Noto Sans Arabic', Arial, sans-serif" : "Arial, sans-serif";
+
+    const L = {
+      en: { title: "EMPLOYMENT CONTRACT", contractNo: "Contract No.", date: "Date", employeeName: "Employee Name", department: "Department", contractType: "Contract Type", startDate: "Start Date", endDate: "End Date", indefinite: "Indefinite", salary: "Monthly Salary", currency: "IQD", status: "Status", empSig: "Employee Signature", hrSig: "HR Manager Signature", sigDate: "Date" },
+      ku: { title: "گرێبەستی کار", contractNo: "ژمارەی گرێبەست", date: "بەروار", employeeName: "ناوی کارمەند", department: "بەش", contractType: "جۆری گرێبەست", startDate: "بەرواری دەستپێکردن", endDate: "بەرواری کۆتایی", indefinite: "بێ کۆتایی", salary: "مووچەی مانگانە", currency: "دینار", status: "دۆخ", empSig: "واژووی کارمەند", hrSig: "واژووی بەڕێوەبەری HR", sigDate: "بەروار" },
+      ar: { title: "عقد عمل", contractNo: "رقم العقد", date: "التاريخ", employeeName: "اسم الموظف", department: "القسم", contractType: "نوع العقد", startDate: "تاريخ البدء", endDate: "تاريخ الانتهاء", indefinite: "غير محدد", salary: "الراتب الشهري", currency: "دينار", status: "الحالة", empSig: "توقيع الموظف", hrSig: "توقيع مدير الموارد البشرية", sigDate: "التاريخ" },
+    }[lang] || { title: "EMPLOYMENT CONTRACT", contractNo: "Contract No.", date: "Date", employeeName: "Employee Name", department: "Department", contractType: "Contract Type", startDate: "Start Date", endDate: "End Date", indefinite: "Indefinite", salary: "Monthly Salary", currency: "IQD", status: "Status", empSig: "Employee Signature", hrSig: "HR Manager Signature", sigDate: "Date" };
+
+    const typeMap = {
+      en: { Permanent: "Permanent", Temporary: "Temporary", "Part-time": "Part-time", Freelance: "Freelance" },
+      ku: { Permanent: "بە بردەوامی", Temporary: "کاتی", "Part-time": "نیوەی کات", Freelance: "فریلانسەر" },
+      ar: { Permanent: "دائم", Temporary: "مؤقت", "Part-time": "دوام جزئي", Freelance: "مستقل" },
+    };
+    const statusMap = {
+      en: { Active: "Active", Inactive: "Inactive", Expired: "Expired", "On Leave": "On Leave", Suspended: "Suspended" },
+      ku: { Active: "چالاک", Inactive: "ناچالاک", Expired: "بەسەرچووی", "On Leave": "مۆڵەت", Suspended: "ئوقووفکراو" },
+      ar: { Active: "نشط", Inactive: "غير نشط", Expired: "منتهي", "On Leave": "في إجازة", Suspended: "موقوف" },
+    };
+
+    const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" }) : L.indefinite;
+    const borderSide = isRTL ? "border-right" : "border-left";
+
+    const html = `<!DOCTYPE html>
+<html dir="${dir}" lang="${lang}">
+<head><meta charset="UTF-8"><title>${L.title}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:${fontFamily};direction:${dir};background:#fff;color:#1a1a2e;padding:48px}
+.header{text-align:center;border-bottom:3px double #1a1a2e;padding-bottom:20px;margin-bottom:28px}
+.title{font-size:24px;font-weight:bold;letter-spacing:2px;margin-bottom:6px}
+.meta{display:flex;justify-content:space-between;margin-bottom:22px;font-size:13px;color:#555}
+.sec-title{font-size:13px;font-weight:bold;background:#f5f5f5;padding:6px 12px;margin-bottom:10px;${borderSide}:4px solid #1a1a2e}
+.row{display:flex;padding:7px 12px;border-bottom:1px solid #eee;font-size:13px}
+.lbl{font-weight:bold;width:200px;flex-shrink:0;color:#444}
+.val{flex:1}
+.sigs{margin-top:64px;display:flex;justify-content:space-between}
+.sig{text-align:center;width:45%}
+.sig-line{border-top:1px solid #333;margin-top:48px;padding-top:7px;font-size:13px;font-weight:bold}
+.sig-date{margin-top:10px;font-size:12px;color:#888}
+@media print{body{padding:24px}button{display:none}}
+</style></head>
+<body>
+<div class="header"><div class="title">${L.title}</div></div>
+<div class="meta">
+  <span>${L.contractNo}: ${rec.id ? String(rec.id).padStart(4, "0") : "—"}</span>
+  <span>${L.date}: ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}</span>
+</div>
+<div class="sec-title">&nbsp;</div>
+<div class="row"><span class="lbl">${L.employeeName}</span><span class="val">${rec.employee_name || "—"}</span></div>
+<div class="row"><span class="lbl">${L.department}</span><span class="val">${rec.department || "—"}</span></div>
+<div class="row"><span class="lbl">${L.contractType}</span><span class="val">${(typeMap[lang] || typeMap.en)[rec.contract_type] || rec.contract_type || "—"}</span></div>
+<div class="row"><span class="lbl">${L.startDate}</span><span class="val">${fmtDate(rec.start_date)}</span></div>
+<div class="row"><span class="lbl">${L.endDate}</span><span class="val">${rec.end_date ? fmtDate(rec.end_date) : L.indefinite}</span></div>
+<div class="row"><span class="lbl">${L.salary}</span><span class="val">${rec.salary ? Number(rec.salary).toLocaleString() + " " + L.currency : "—"}</span></div>
+<div class="row"><span class="lbl">${L.status}</span><span class="val">${(statusMap[lang] || statusMap.en)[rec.status] || rec.status || "—"}</span></div>
+<div class="sigs">
+  <div class="sig"><div class="sig-line">${L.empSig}</div><div class="sig-date">${L.sigDate}: ___________</div></div>
+  <div class="sig"><div class="sig-line">${L.hrSig}</div><div class="sig-date">${L.sigDate}: ___________</div></div>
+</div>
+<script>window.onload=()=>window.print();<\/script>
+</body></html>`;
+
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  };
+
   const getEmpData = (name) => { const idx = employees.findIndex(e => e.employee_name === name); return { ac: AV_COLORS[idx >= 0 ? idx % AV_COLORS.length : 0], id: employees[idx]?.id, image: employees[idx]?.image || null }; };
 
   const columns = [
@@ -134,7 +204,6 @@ export default function Contracts() {
           <div className="hr-ps">{t.cont_active_sub(stats.active)}</div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn-print" onClick={() => window.print()} title="Print"><Printer size={13} /> Print</button>
           <button className="hr-btn" onClick={() => { resetForm(); setShowForm(true); }}><Plus size={13} /> {t.cont_btn}</button>
         </div>
       </div>
@@ -173,6 +242,7 @@ export default function Contracts() {
               <TableCell onClick={e => e.stopPropagation()}>
                 <div className="cont-action-btns">
                   <button className="hr-btn-sm hr-btn-edit" onClick={() => prepareEdit(rec)}>{t.btn_edit}</button>
+                  <button className="btn-print" onClick={() => printContract(rec)} title={lang === "ku" ? "چاپکردنی گرێبەست" : lang === "ar" ? "طباعة العقد" : "Print Contract"}><FileText size={12} /></button>
                   <DeleteConfirmDialog onConfirm={() => deleteRecord(rec.id)} itemName="contract" />
                 </div>
               </TableCell>

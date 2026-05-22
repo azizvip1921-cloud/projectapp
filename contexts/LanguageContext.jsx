@@ -259,6 +259,7 @@ export const translations = {
     cont_fld_salary: "Salary (IQD)",
     cont_btn_add: "Add Contract",
     cont_btn_update: "Update Contract",
+    cont_expired_toast: (name) => `⚠️ ${name} — Contract has expired and set to Inactive`,
     // Documents
     docs_title: "Documents",
     docs_files_sub: (n) => `${n} files`,
@@ -889,6 +890,7 @@ export const translations = {
     cont_fld_salary: "مووچە (دینار)",
     cont_btn_add: "زیادکردنی گرێبەست",
     cont_btn_update: "نوێکردنەوەی گرێبەست",
+    cont_expired_toast: (name) => `⚠️ ${name} — گرێبەست تەواو بووە و بووە ناچالاک`,
     // Documents
     docs_title: "بەڵگەنامەکان",
     docs_files_sub: (n) => `${n} فایل`,
@@ -1501,6 +1503,7 @@ export const translations = {
     cont_fld_salary: "الراتب (دينار)",
     cont_btn_add: "إضافة عقد",
     cont_btn_update: "تحديث العقد",
+    cont_expired_toast: (name) => `⚠️ ${name} — انتهى العقد وأصبح غير نشط`,
     // Documents
     docs_title: "المستندات",
     docs_files_sub: (n) => `${n} ملف`,

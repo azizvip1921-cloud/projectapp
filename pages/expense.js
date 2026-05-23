@@ -128,6 +128,10 @@ export default function Expenses() {
 
   const getEmpData = (name) => { const idx = employees.findIndex(e => e.employee_name === name); return { dept: employees[idx]?.department || "—", email: employees[idx]?.email || "", ac: AV_COLORS[idx >= 0 ? idx % AV_COLORS.length : 0] }; };
 
+  const monthLabel = filterDate
+    ? new Date(filterDate + "-01").toLocaleDateString("en-GB", { month: "long", year: "numeric" })
+    : new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+
   const columns = [
     { key: "num",         label: "#" },
     { key: "employee",    label: t.col_employee },
@@ -149,11 +153,17 @@ export default function Expenses() {
         </div>
         <div className="ph-main-actions">
           <input type="month" value={filterDate} onChange={e => setFilterDate(e.target.value)} className="exp-month-input" />
-          <button className="btn-print" onClick={() => window.print()} title="Print"><Printer size={13} /> Print</button>
+          <button className="btn-print" onClick={() => window.print()} title={t.btn_print}><Printer size={13} /> {t.btn_print}</button>
         </div>
         <div className="ph-extra-actions">
           <button className="hr-btn" onClick={() => { resetForm(); setShowForm(true); }}><Plus size={13} /> {t.exp_btn}</button>
         </div>
+      </div>
+
+      {/* Print-only header */}
+      <div className="exp-print-header">
+        <div className="exp-print-title">{t.exp_title}</div>
+        <div className="exp-print-month">{monthLabel}</div>
       </div>
 
       {/* Always visible content */}

@@ -18,6 +18,12 @@ const fmtDate = s => s ? new Date(String(s).slice(0,10)+"T00:00:00").toLocaleDat
 
 const STATUS_CFG = { Paid: { bg: "#DCFCE7", color: "#15803D" }, Pending: { bg: "#FEF9C3", color: "#92400E" }, Failed: { bg: "#FEE2E2", color: "#DC2626" } };
 
+const AVATAR_COLORS = [
+  { bg: "#EFF6FF", color: "#1D4ED8" }, { bg: "#DCFCE7", color: "#15803D" },
+  { bg: "#FEF9C3", color: "#92400E" }, { bg: "#F3E8FF", color: "#7C3AED" },
+  { bg: "#FEE2E2", color: "#DC2626" }, { bg: "#DBEAFE", color: "#1E40AF" },
+];
+
 function Badge({ text }) {
   const { tv } = useLanguage();
   const c = STATUS_CFG[text] || { bg: "#F1F5F9", color: "#64748B" };
@@ -66,9 +72,9 @@ function PayrollManagementTab() {
         ? await fetch(`/api/payroll/${editId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
         : await fetch("/api/payroll", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) throw new Error();
-      toast.success(editId ? "Updated successfully" : "Payroll record added");
+      toast.success(editId ? t.pay_toast_update : t.pay_toast_add);
       resetForm(); fetchRecords();
-    } catch { toast.error("An error occurred"); }
+    } catch { toast.error(t.pay_toast_err); }
   };
 
   const resetForm = () => {
@@ -88,13 +94,13 @@ function PayrollManagementTab() {
       const rec = records.find(r => r.id === id);
       const res = await fetch(`/api/payroll/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...rec, status: "Paid", payment_date: rec.payment_date || localToday() }) });
       if (!res.ok) throw new Error();
-      toast.success("Marked as paid"); fetchRecords();
-    } catch { toast.error("Failed to update"); }
+      toast.success(t.pay_toast_paid); fetchRecords();
+    } catch { toast.error(t.pay_toast_err_upd); }
   };
 
   const deleteRecord = async (id) => {
-    try { const res = await fetch(`/api/payroll/${id}`, { method: "DELETE" }); if (!res.ok) throw new Error(); toast.success("Deleted"); fetchRecords(); }
-    catch { toast.error("Failed to delete"); }
+    try { const res = await fetch(`/api/payroll/${id}`, { method: "DELETE" }); if (!res.ok) throw new Error(); toast.success(t.pay_toast_delete); fetchRecords(); }
+    catch { toast.error(t.pay_toast_err_del); }
   };
 
   const filteredRecords = records.filter(r => {
@@ -109,9 +115,18 @@ function PayrollManagementTab() {
   const pending         = filteredRecords.filter(r => r.status === "Pending").length;
   const totalDeductions = paidRecords.reduce((s, r) => s + (Number(r.deductions) || 0), 0);
 
+  const monthLabel = filterDate
+    ? new Date(filterDate + "-01").toLocaleDateString("en-GB", { month: "long", year: "numeric" })
+    : new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+
   const getEmpData = (name) => {
     const idx = employees.findIndex(e => e.employee_name === name);
-    return { dept: employees[idx]?.department || "—" };
+    const emp = employees[idx];
+    return {
+      dept: emp?.department || "—",
+      image: emp?.image || "",
+      ac: AVATAR_COLORS[idx >= 0 ? idx % AVATAR_COLORS.length : 0],
+    };
   };
 
   const viewToggle = (
@@ -126,12 +141,15 @@ function PayrollManagementTab() {
   );
 
   const renderCard = (rec) => {
-    const dept = getEmpData(rec.employee_name).dept;
+    const empData = getEmpData(rec.employee_name);
     const payDate = fmtDate(rec.payment_date);
     return (
       <div key={rec.id} className="emp-card">
-        <div className="emp-card-name" style={{ marginTop: 4 }}>{rec.employee_name}</div>
-        <div className="emp-card-empid">{dept}</div>
+        <div className="pay-avatar-sm" style={{ background: empData.image ? "transparent" : empData.ac.bg, color: empData.ac.color, margin: "4px auto 6px" }}>
+          {empData.image ? <img src={empData.image} alt={rec.employee_name} className="pay-avatar-img" /> : rec.employee_name.charAt(0).toUpperCase()}
+        </div>
+        <div className="emp-card-name">{rec.employee_name}</div>
+        <div className="emp-card-empid">{empData.dept}</div>
         <div className="emp-card-email">{payDate}</div>
         <div className="emp-card-badges">
           <Badge text={rec.status} />
@@ -175,11 +193,17 @@ function PayrollManagementTab() {
             onChange={e => setFilterDate(e.target.value)}
             className="pay-month-input"
           />
-          <button className="btn-print" onClick={() => window.print()} title="Print"><Printer size={13} /> Print</button>
+          <button className="btn-print" onClick={() => window.print()} title={t.btn_print}><Printer size={13} /> {t.btn_print}</button>
         </div>
         <div className="ph-extra-actions">
           <button className="hr-btn" onClick={() => { resetForm(); setShowForm(true); }}><Plus size={13} /> {t.pay_btn_add}</button>
         </div>
+      </div>
+
+      {/* Print-only header */}
+      <div className="pay-print-header">
+        <div className="pay-print-title">{t.pay_title}</div>
+        <div className="pay-print-month">{monthLabel}</div>
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-4 shiny-ring">
@@ -210,13 +234,21 @@ function PayrollManagementTab() {
           <TableRow key={rec.id} className="hover:bg-muted/50">
             <TableCell className="pay-tbl-idx">{index + 1}</TableCell>
             <TableCell>
-              {/* Clickable employee name — navigates to Employee Salaries tab filtered by this employee */}
               <button
                 onClick={() => router.push(`/payroll?panel=salaries&emp=${encodeURIComponent(rec.employee_name)}`)}
-                style={{ background: "none", border: "none", cursor: "pointer", textAlign: "start", padding: 0 }}
+                className="pay-emp-cell pay-emp-cell-btn"
               >
-                <div className="pay-tbl-emp-name">{rec.employee_name}</div>
-                <div className="pay-tbl-emp-dept">{getEmpData(rec.employee_name).dept}</div>
+                {(() => { const emp = getEmpData(rec.employee_name); return (
+                  <>
+                    <div className="pay-avatar-sm" style={{ background: emp.image ? "transparent" : emp.ac.bg, color: emp.ac.color }}>
+                      {emp.image ? <img src={emp.image} alt={rec.employee_name} className="pay-avatar-img" /> : rec.employee_name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="pay-tbl-emp-name">{rec.employee_name}</div>
+                      <div className="pay-tbl-emp-dept">{emp.dept}</div>
+                    </div>
+                  </>
+                ); })()}
               </button>
             </TableCell>
             <TableCell className="pay-tbl-date">

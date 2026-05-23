@@ -21,15 +21,6 @@ export default async function handler(req, res) {
         "INSERT INTO payroll (employee_name, month, payment_date, base_salary, bonus, deductions, net, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         [employee_name, resolvedMonth, payment_date || null, Number(base_salary), Number(bonus || 0), Number(deductions || 0), Number(net || 0), status || "Pending"]
       );
-      const netAmount = Number(net || 0);
-      if (netAmount > 0) {
-        const [safeGoals] = await data.query("SELECT * FROM safe ORDER BY saved DESC LIMIT 1");
-        if (safeGoals.length > 0) {
-          const goal = safeGoals[0];
-          const newSaved = Math.max(0, Number(goal.saved) - netAmount);
-          await data.query("UPDATE safe SET saved=? WHERE id=?", [newSaved, goal.id]);
-        }
-      }
       res.status(200).json({ success: true, message: "Payroll record added successfully" });
     } catch (error) {
       console.error("database error:", error);

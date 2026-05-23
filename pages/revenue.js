@@ -121,9 +121,9 @@ export default function Revenue() {
         ? await fetch(`/api/revenue/${editId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
         : await fetch("/api/revenue", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) throw new Error();
-      toast.success(editId ? "Updated" : "Revenue added");
+      toast.success(editId ? t.rev_toast_update : t.rev_toast_add);
       resetForm(); fetchRecords();
-    } catch { toast.error("An error occurred"); }
+    } catch { toast.error(t.rev_toast_err); }
   };
 
   const resetForm = () => {
@@ -138,8 +138,8 @@ export default function Revenue() {
   };
 
   const deleteRecord = async (id) => {
-    try { const res = await fetch(`/api/revenue/${id}`, { method: "DELETE" }); if (!res.ok) throw new Error(); toast.success("Deleted"); fetchRecords(); }
-    catch { toast.error("Failed to delete"); }
+    try { const res = await fetch(`/api/revenue/${id}`, { method: "DELETE" }); if (!res.ok) throw new Error(); toast.success(t.rev_toast_delete); fetchRecords(); }
+    catch { toast.error(t.rev_toast_err_del); }
   };
 
   const total = records.reduce((s, r) => s + Number(r.amount || 0), 0);

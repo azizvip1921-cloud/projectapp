@@ -4570,12 +4570,26 @@ to {
   font-weight:700;
   color:#F59E0B;
 }
+.exp-emp-cell {
+  min-width: 150px;
+}
 .exp-num-cell {
   font-size:12px;
   color:#94A3B8;
   font-weight:600;
   width:40px;
 }
+
+/* Badge variants — status */
+.hr-badge--pending    { background: #FEF9C3; color: #92400E; }
+.hr-badge--approved   { background: #DCFCE7; color: #15803D; }
+.hr-badge--rejected   { background: #FEE2E2; color: #DC2626; }
+
+/* Badge variants — expense categories */
+.hr-badge--travel,
+.hr-badge--equipment,
+.hr-badge--meals,
+.hr-badge--other      { background: #F1F5F9; color: #64748B; }
 .exp-emp-name {
   font-weight:600;
   font-size:12px;
@@ -4811,6 +4825,13 @@ to {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+.pay-emp-cell-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-align: start;
 }
 .pay-tbl-count {
   font-weight: 600;
@@ -6840,4 +6861,162 @@ to {
   }
 }
 
+/* ════════════════════════════════════════════════
+   Date / Time Input — mobile only customisation
+   (desktop keeps native browser behaviour)
+   ════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* Hide native calendar/clock indicator — replaced by custom icon */
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator,
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    display: none;
+  }
 
+  /* When empty: hide native "mm/dd/yyyy" / "--:--" ghost text
+     so only our custom placeholder span is visible */
+  input[type="date"][data-empty]:not(:focus),
+  input[type="time"][data-empty]:not(:focus),
+  input[type="datetime-local"][data-empty]:not(:focus) {
+    color: transparent !important;
+  }
+}
+
+/* ══════════════════════════════════════════
+   Expense print-only header (hidden on screen)
+   ══════════════════════════════════════════ */
+.exp-print-header { display: none; }
+.pay-print-header { display: none; }
+
+/* ══════════════════════════════════════════
+   PRINT STYLES — Expenses page
+   ══════════════════════════════════════════ */
+@media print {
+  /* Hide sidebar, top nav, page controls, pagination */
+  [data-slot="sidebar"],
+  .ph-bar,
+  .hr-ph,
+  .hr-filters,
+  .exp-action-btns,
+  .hr-modal-overlay,
+  .sidebar-toggle-btn,
+  .dt-perpage,
+  .pagination-btn,
+  .flex.items-center.justify-between.px-1 {
+    display: none !important;
+  }
+
+  /* Remove sidebar offset */
+  [data-slot="sidebar-inset"] {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Remove inner padding and ring */
+  .flex.flex-1.flex-col.gap-4.p-4.shiny-ring {
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Show print-only header */
+  .exp-print-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid #1a1a2e;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+  }
+
+  .exp-print-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1a1a2e;
+  }
+
+  .exp-print-month {
+    font-size: 13px;
+    color: #555;
+    margin-top: 4px;
+  }
+
+  .exp-print-date {
+    font-size: 12px;
+    color: #888;
+  }
+
+  /* Stat cards: 3-column row */
+  .hr-stat-grid-3 {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .emp-stat-card {
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  /* Table: full width, no scroll */
+  .rounded-md.border.overflow-auto,
+  table {
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* Hide Actions column (last column) */
+  th:last-child,
+  td:last-child {
+    display: none !important;
+  }
+
+  tr { break-inside: avoid; }
+
+  /* Payroll print header */
+  .pay-print-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid #1a1a2e;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+  }
+  .pay-print-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1a1a2e;
+  }
+  .pay-print-month {
+    font-size: 13px;
+    color: #555;
+    margin-top: 4px;
+  }
+
+  /* Hide action/nav buttons and search/filter in print */
+  .pay-tbl-actions,
+  .pay-btn-back,
+  .btn-print,
+  .docs-search-wrap,
+  .docs-filter-wrap { display: none !important; }
+
+  /* Payroll 4-column stat grid */
+  .pay-stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+}

@@ -58,9 +58,9 @@ export default function Requests() {
         ? await fetch(`/api/requests/${editId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
         : await fetch("/api/requests", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) throw new Error();
-      toast.success(editId ? "Updated" : "Request submitted");
+      toast.success(editId ? t.req_toast_update : t.req_toast_add);
       resetForm(); fetchRecords();
-    } catch { toast.error("An error occurred"); }
+    } catch { toast.error(t.req_toast_err); }
   };
 
   const resetForm = () => {
@@ -78,13 +78,13 @@ export default function Requests() {
       const rec = records.find(r => r.id === id);
       const res = await fetch(`/api/requests/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...rec, status: newStatus }) });
       if (!res.ok) throw new Error();
-      toast.success(`Request ${newStatus.toLowerCase()}`); fetchRecords();
-    } catch { toast.error("Failed to update"); }
+      toast.success(newStatus === "Approved" ? t.req_toast_approved : t.req_toast_rejected); fetchRecords();
+    } catch { toast.error(t.req_toast_err_upd); }
   };
 
   const deleteRecord = async (id) => {
-    try { const res = await fetch(`/api/requests/${id}`, { method: "DELETE" }); if (!res.ok) throw new Error(); toast.success("Deleted"); fetchRecords(); }
-    catch { toast.error("Failed to delete"); }
+    try { const res = await fetch(`/api/requests/${id}`, { method: "DELETE" }); if (!res.ok) throw new Error(); toast.success(t.req_toast_delete); fetchRecords(); }
+    catch { toast.error(t.req_toast_err_del); }
   };
 
   const pending  = records.filter(r => r.status === "Pending").length;

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
-import { Sun, Moon, Globe, User, LogOut, ChevronDown, KeyRound, Bell, Calendar, FileText, DollarSign, Search, Users, ClipboardList, Briefcase, CreditCard, TrendingUp, ShieldCheck, Clock, FileCheck, Settings, Wallet, Building2, Palette, Database, Wifi, CalendarDays, File, LayoutDashboard, Inbox, Receipt, CalendarOff } from "lucide-react";
+import { Sun, Moon, Globe, User, LogOut, ChevronDown, KeyRound, Bell, Calendar, FileText, DollarSign, Search, Users, ClipboardList, Briefcase, CreditCard, TrendingUp, ShieldCheck, Clock, FileCheck, Settings, Wallet, Building2, Palette, Database, Wifi, CalendarDays, File, LayoutDashboard, Inbox, Receipt, CalendarOff} from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useFormVisibility } from "@/components/FormVisibilityContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -307,22 +307,22 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
       )}
 
       <Dialog open={showChangePw} onOpenChange={(open) => { setShowChangePw(open); if (!open) setPwError(""); }}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent className="sm:max-w-sm" dir={t.dir || "ltr"}>
           <DialogHeader>
             <DialogTitle>{t.prof_change_password || "Change Password"}</DialogTitle>
           </DialogHeader>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 4 }}>
             <div>
               <Label htmlFor="cp-current">{t.prof_change_password_current || "Current Password"}</Label>
-              <Input id="cp-current" type="password" value={pwForm.current} onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))} style={{ marginTop: 4 }} />
+              <Input id="cp-current" type="password" autoComplete="current-password" value={pwForm.current} onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))} style={{ marginTop: 4 }} />
             </div>
             <div>
               <Label htmlFor="cp-new">{t.prof_change_password_new || "New Password"}</Label>
-              <Input id="cp-new" type="password" value={pwForm.next} onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))} style={{ marginTop: 4 }} />
+              <Input id="cp-new" type="password" autoComplete="new-password" value={pwForm.next} onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))} style={{ marginTop: 4 }} />
             </div>
             <div>
               <Label htmlFor="cp-confirm">{t.prof_change_password_confirm || "Confirm New Password"}</Label>
-              <Input id="cp-confirm" type="password" value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))} style={{ marginTop: 4 }} />
+              <Input id="cp-confirm" type="password" autoComplete="new-password" value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))} style={{ marginTop: 4 }} />
             </div>
             {pwError && <div style={{ color: "#DC2626", fontSize: 12 }}>{pwError}</div>}
             <button

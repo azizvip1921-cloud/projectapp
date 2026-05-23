@@ -241,8 +241,8 @@ export default function EmployeeSalaries() {
                 </svg>
                 {t.btn_back}
               </button>
-              <button className="btn-print" onClick={() => window.print()} title="Print">
-                <Printer size={13} /> Print
+              <button className="btn-print" onClick={() => window.print()} title={t.btn_print}>
+                <Printer size={13} /> {t.btn_print}
               </button>
             </div>
             <div className="pay-emp-header">
@@ -296,69 +296,68 @@ export default function EmployeeSalaries() {
             itemLabel="employees"
             toolbar={toolbar}
             filterSlot={filterSlot}
-            renderRow={(emp, index) => (
-              <TableRow
-                key={emp.id}
-                className="hover:bg-muted/50 cursor-pointer"
-                onClick={() => { setEmpFilter(emp.employee_name); setSearch(""); }}
-              >
-                <TableCell className="pay-tbl-idx">{index + 1}</TableCell>
+            renderRow={(emp, index) => {
+              const goToEmp = () => { setEmpFilter(emp.employee_name); setSearch(""); };
+              return (
+                <TableRow key={emp.id} className="hover:bg-muted/50">
+                  <TableCell className="pay-tbl-idx">{index + 1}</TableCell>
 
-                <TableCell className="min-w-[180px]">
-                  <div className="pay-emp-cell">
-                    <div
-                      className="pay-avatar-sm"
-                      style={{
-                        background: emp.image ? "transparent" : emp.ac.bg,
-                        color: emp.ac.color,
-                      }}
+                  <TableCell className="min-w-[180px]">
+                    <div className="pay-emp-cell">
+                      <div
+                        className="pay-avatar-sm"
+                        style={{
+                          background: emp.image ? "transparent" : emp.ac.bg,
+                          color: emp.ac.color,
+                        }}
+                      >
+                        {emp.image
+                          ? <img src={emp.image} alt={emp.employee_name} className="pay-avatar-img" />
+                          : emp.employee_name.charAt(0).toUpperCase()
+                        }
+                      </div>
+                      <div>
+                        <div className="pay-tbl-emp-name">{emp.employee_name}</div>
+                        <div className="pay-tbl-emp-dept">{emp.department}</div>
+                      </div>
+                    </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <span className="pay-tbl-count">{emp.totalRecords}</span>
+                  </TableCell>
+
+                  <TableCell>
+                    <span className="pay-tbl-paid">
+                      {emp.totalPaid.toLocaleString()} IQD
+                    </span>
+                  </TableCell>
+
+                  <TableCell>
+                    <span className="pay-tbl-pending">
+                      {emp.totalPending > 0 ? `${emp.totalPending.toLocaleString()} IQD` : "—"}
+                    </span>
+                  </TableCell>
+
+                  <TableCell className="pay-tbl-date">
+                    {fmtDate(emp.lastPaymentDate)}
+                  </TableCell>
+
+                  <TableCell>
+                    <button
+                      onClick={goToEmp}
+                      className="pay-sal-view-btn"
                     >
-                      {emp.image
-                        ? <img src={emp.image} alt={emp.employee_name} className="pay-avatar-img" />
-                        : emp.employee_name.charAt(0).toUpperCase()
-                      }
-                    </div>
-                    <div>
-                      <div className="pay-tbl-emp-name">{emp.employee_name}</div>
-                      <div className="pay-tbl-emp-dept">{emp.department}</div>
-                    </div>
-                  </div>
-                </TableCell>
-
-                <TableCell>
-                  <span className="pay-tbl-count">{emp.totalRecords}</span>
-                </TableCell>
-
-                <TableCell>
-                  <span className="pay-tbl-paid">
-                    {emp.totalPaid.toLocaleString()} IQD
-                  </span>
-                </TableCell>
-
-                <TableCell>
-                  <span className="pay-tbl-pending">
-                    {emp.totalPending > 0 ? `${emp.totalPending.toLocaleString()} IQD` : "—"}
-                  </span>
-                </TableCell>
-
-                <TableCell className="pay-tbl-date">
-                  {fmtDate(emp.lastPaymentDate)}
-                </TableCell>
-
-                <TableCell onClick={e => e.stopPropagation()}>
-                  <button
-                    onClick={() => { setEmpFilter(emp.employee_name); setSearch(""); }}
-                    className="pay-sal-view-btn"
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                      <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                    {t.pay_sal_view}
-                  </button>
-                </TableCell>
-              </TableRow>
-            )}
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                      {t.pay_sal_view}
+                    </button>
+                  </TableCell>
+                </TableRow>
+              );
+            }}
           />
         ) : (
           /* ── Detail view: one row per payroll record ── */

@@ -147,7 +147,7 @@ export default function UsersPage() {
       return;
     }
     if (!editId) {
-      if (!selectedEmployee) { toast.warning(t.usr_toast_emp_req || "Please select an employee"); return; }
+      if (!selectedEmployee) { toast.warning(t.usr_toast_emp_req); return; }
       if (!addPassword) { toast.warning(t.usr_toast_pwd_req); return; }
       if (addPassword !== addConfirmPassword) { toast.error(t.usr_toast_pwd_mismatch); return; }
       if (addPassword.length < 6) { toast.warning(t.usr_toast_pwd_short); return; }

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useFormVisibility } from "@/components/FormVisibilityContext";
 import { toast } from "sonner";
-import { Plus, User, Upload, Search, Users, UserCheck, UserX, Clock, UserMinus, LayoutGrid, List, Printer } from "lucide-react";
+import { Plus, User, Upload, Search, Users, UserCheck, UserX, Clock, UserMinus, LayoutGrid, List } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -100,26 +100,26 @@ export default function Employee() {
   const addEmployee = async () => {
     const res = await fetch("/api/employee", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(buildPayload()) });
     const data = await res.json();
-    if (!res.ok) { toast.error(data.message || "Failed to add"); return; }
-    toast.success("Employee added successfully");
+    if (!res.ok) { toast.error(data.message || t.emp_toast_err_add); return; }
+    toast.success(t.emp_toast_add);
     resetForm(); fetchEmployees();
   };
 
   const updateEmployee = async (id) => {
     const res = await fetch(`/api/employee/${id}`, { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(buildPayload()) });
-    if (!res.ok) { const d = await res.json(); toast.error(d.message || "Failed to update"); return; }
-    toast.success("Employee updated successfully");
+    if (!res.ok) { const d = await res.json(); toast.error(d.message || t.emp_toast_err_upd); return; }
+    toast.success(t.emp_toast_update);
     resetForm(); fetchEmployees();
   };
 
   const Submit = async (e) => {
     e.preventDefault();
     if (!employee_name.trim() || !number.trim() || !email.trim() || !type_of_job.trim() || !gender.trim()) {
-      toast.warning("Please fill in all required fields"); return;
+      toast.warning(t.lbl_required); return;
     }
     try {
       if (editId) await updateEmployee(editId); else await addEmployee();
-    } catch (err) { toast.error("Something went wrong"); }
+    } catch (err) { toast.error(t.emp_toast_err); }
   };
 
   const resetForm = () => {
@@ -156,9 +156,9 @@ export default function Employee() {
     try {
       const res = await fetch(`/api/employee/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
-      toast.success("Employee deleted successfully");
+      toast.success(t.emp_toast_delete);
       fetchEmployees();
-    } catch { toast.error("Failed to delete employee"); }
+    } catch { toast.error(t.emp_toast_err_del); }
   };
 
   const deactivateEmployee = async (emp) => {
@@ -168,11 +168,11 @@ export default function Employee() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ ...emp, status: "Inactive" }),
       });
-      if (!res.ok) { toast.error("Failed to deactivate"); return; }
-      toast.success(`${emp.employee_name} deactivated`);
+      if (!res.ok) { toast.error(t.emp_toast_err_deactivate); return; }
+      toast.success(t.emp_toast_deactivated(emp.employee_name));
       setProfileEmployee(prev => prev ? { ...prev, status: "Inactive" } : null);
       fetchEmployees();
-    } catch { toast.error("Failed to deactivate"); }
+    } catch { toast.error(t.emp_toast_err_deactivate); }
   };
 
   const DEPTS = ["All", "IT", "Finance", "HR", "Marketing", "Operations", "Design"];
@@ -261,9 +261,6 @@ export default function Employee() {
           <div className="emp-page-sub">{t.emp_total(employees.length)}</div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn-print" onClick={() => window.print()} title="Print">
-            <Printer size={13} /> Print
-          </button>
           <button className="emp-add-btn" onClick={() => setShowForm(true)}>
             <Plus size={13} /> {t.emp_add_btn}
           </button>
@@ -319,7 +316,7 @@ export default function Employee() {
               </div>
               <div className="emp-dept-btns">
                 {DEPTS.map(d => (
-                  <button key={d} onClick={() => setFilterDept(d)} className={`emp-filter${filterDept === d ? " on" : ""}`}>{d}</button>
+                  <button key={d} onClick={() => setFilterDept(d)} className={`emp-filter${filterDept === d ? " on" : ""}`}>{d === "All" ? t.lbl_all : tv(d)}</button>
                 ))}
               </div>
             </div>

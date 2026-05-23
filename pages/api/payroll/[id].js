@@ -19,15 +19,7 @@ export default async function handler(req, res) {
   } else if (req.method === "DELETE") {
     try {
       // Get the net salary before deleting
-      const [payRows] = await data.query("SELECT net FROM payroll WHERE id=?", [id]);
-      const netAmount = payRows.length > 0 ? Number(payRows[0].net) : 0;
       await data.query("DELETE FROM payroll WHERE id=?", [id]);
-      if (netAmount > 0) {
-        const [safeGoals] = await data.query("SELECT * FROM safe ORDER BY saved DESC LIMIT 1");
-        if (safeGoals.length > 0) {
-          await data.query("UPDATE safe SET saved=saved+? WHERE id=?", [netAmount, safeGoals[0].id]);
-        }
-      }
       res.status(200).json({ success: true, message: "Payroll record deleted successfully" });
     } catch (error) {
       console.error("database error:", error);

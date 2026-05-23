@@ -97,9 +97,9 @@ export default function Documents() {
         ? await fetch(`/api/documents/${editId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
         : await fetch("/api/documents", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) throw new Error();
-      toast.success(editId ? "Updated" : "Document added");
+      toast.success(editId ? t.docs_toast_update : t.docs_toast_add);
       resetForm(); fetchDocs();
-    } catch { toast.error("An error occurred"); }
+    } catch { toast.error(t.docs_toast_err); }
   };
 
   const resetForm = () => {
@@ -115,8 +115,8 @@ export default function Documents() {
   };
 
   const deleteDoc = async (id) => {
-    try { const res = await fetch(`/api/documents/${id}`, { method: "DELETE" }); if (!res.ok) throw new Error(); toast.success("Deleted"); fetchDocs(); }
-    catch { toast.error("Failed to delete"); }
+    try { const res = await fetch(`/api/documents/${id}`, { method: "DELETE" }); if (!res.ok) throw new Error(); toast.success(t.docs_toast_delete); fetchDocs(); }
+    catch { toast.error(t.docs_toast_err_del); }
   };
 
   const TYPE_EXT = { PDF: "pdf", Word: "docx", Excel: "xlsx", Image: "jpg", Other: "bin" };

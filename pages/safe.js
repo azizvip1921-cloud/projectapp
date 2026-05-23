@@ -76,9 +76,9 @@ export default function Savings() {
         ? await fetch(`/api/safe/${editId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
         : await fetch("/api/safe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) throw new Error();
-      toast.success(editId ? "Goal updated" : "Savings goal added");
+      toast.success(editId ? t.sav_toast_update : t.sav_toast_add);
       resetForm(); fetchGoals();
-    } catch { toast.error("An error occurred"); }
+    } catch { toast.error(t.sav_toast_err); }
   };
 
   const resetForm = () => {
@@ -98,12 +98,12 @@ export default function Savings() {
       const res = await fetch(`/api/safe/${goal.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...goal, target: newTarget }) });
       if (!res.ok) throw new Error();
       fetchGoals();
-    } catch { toast.error("Failed to update"); }
+    } catch { toast.error(t.sav_toast_err_upd); }
   };
 
   const deleteGoal = async (id) => {
-    try { const res = await fetch(`/api/safe/${id}`, { method: "DELETE" }); if (!res.ok) throw new Error(); toast.success("Goal deleted"); fetchGoals(); }
-    catch { toast.error("Failed to delete"); }
+    try { const res = await fetch(`/api/safe/${id}`, { method: "DELETE" }); if (!res.ok) throw new Error(); toast.success(t.sav_toast_delete); fetchGoals(); }
+    catch { toast.error(t.sav_toast_err_del); }
   };
 
   const filteredGoals = goals.filter(g => !filterMonth || (g.started && g.started.slice(0, 7) === filterMonth));

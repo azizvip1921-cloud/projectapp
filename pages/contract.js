@@ -84,15 +84,22 @@ export default function Contracts() {
   const submit = async (e) => {
     e.preventDefault();
     if (!employee_name || !start_date || !contract_type) { toast.warning(t.lbl_required); return; }
-    const body = { employee_name, department, contract_type, start_date, end_date, salary: Number(salary || 0), status };
+    const endDateIsFuture = end_date && new Date(end_date) > new Date(new Date().toDateString());
+    const shouldRestoreActive = editId && (!end_date || endDateIsFuture);
+    const resolvedStatus = shouldRestoreActive ? "Active" : status;
+    const body = { employee_name, department, contract_type, start_date, end_date, salary: Number(salary || 0), status: resolvedStatus };
     try {
       const res = editId
         ? await fetch(`/api/contracts/${editId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
         : await fetch("/api/contracts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) throw new Error();
-      toast.success(editId ? "Updated" : "Contract added");
+      if (shouldRestoreActive) {
+        const emp = employees.find(e => e.employee_name === employee_name);
+        if (emp) await fetch(`/api/employee/${emp.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "Active" }) });
+      }
+      toast.success(editId ? t.cont_toast_update : t.cont_toast_add);
       resetForm(); fetchRecords();
-    } catch { toast.error("An error occurred"); }
+    } catch { toast.error(t.cont_toast_err); }
   };
 
   const resetForm = () => {
@@ -108,8 +115,8 @@ export default function Contracts() {
   };
 
   const deleteRecord = async (id) => {
-    try { const res = await fetch(`/api/contracts/${id}`, { method: "DELETE" }); if (!res.ok) throw new Error(); toast.success("Deleted"); fetchRecords(); }
-    catch { toast.error("Failed to delete"); }
+    try { const res = await fetch(`/api/contracts/${id}`, { method: "DELETE" }); if (!res.ok) throw new Error(); toast.success(t.cont_toast_delete); fetchRecords(); }
+    catch { toast.error(t.cont_toast_err_del); }
   };
 
   const stats = { total: records.length, active: records.filter(r => r.status === "Active").length, inactive: records.filter(r => r.status === "Inactive").length, onLeave: records.filter(r => r.status === "On Leave").length, suspended: records.filter(r => r.status === "Suspended").length, permanent: records.filter(r => r.contract_type === "Permanent").length, temporary: records.filter(r => r.contract_type === "Temporary").length };
@@ -120,11 +127,13 @@ export default function Contracts() {
     const dir = isRTL ? "rtl" : "ltr";
     const fontFamily = isRTL ? "'Noto Sans Arabic', Arial, sans-serif" : "Arial, sans-serif";
 
+    const empData = employees.find(e => e.employee_name === rec.employee_name) || {};
+
     const L = {
-      en: { title: "EMPLOYMENT CONTRACT", contractNo: "Contract No.", date: "Date", employeeName: "Employee Name", department: "Department", contractType: "Contract Type", startDate: "Start Date", endDate: "End Date", indefinite: "Indefinite", salary: "Monthly Salary", currency: "IQD", status: "Status", empSig: "Employee Signature", hrSig: "HR Manager Signature", sigDate: "Date" },
-      ku: { title: "گرێبەستی کار", contractNo: "ژمارەی گرێبەست", date: "بەروار", employeeName: "ناوی کارمەند", department: "بەش", contractType: "جۆری گرێبەست", startDate: "بەرواری دەستپێکردن", endDate: "بەرواری کۆتایی", indefinite: "بێ کۆتایی", salary: "مووچەی مانگانە", currency: "دینار", status: "دۆخ", empSig: "واژووی کارمەند", hrSig: "واژووی بەڕێوەبەری HR", sigDate: "بەروار" },
-      ar: { title: "عقد عمل", contractNo: "رقم العقد", date: "التاريخ", employeeName: "اسم الموظف", department: "القسم", contractType: "نوع العقد", startDate: "تاريخ البدء", endDate: "تاريخ الانتهاء", indefinite: "غير محدد", salary: "الراتب الشهري", currency: "دينار", status: "الحالة", empSig: "توقيع الموظف", hrSig: "توقيع مدير الموارد البشرية", sigDate: "التاريخ" },
-    }[lang] || { title: "EMPLOYMENT CONTRACT", contractNo: "Contract No.", date: "Date", employeeName: "Employee Name", department: "Department", contractType: "Contract Type", startDate: "Start Date", endDate: "End Date", indefinite: "Indefinite", salary: "Monthly Salary", currency: "IQD", status: "Status", empSig: "Employee Signature", hrSig: "HR Manager Signature", sigDate: "Date" };
+      en: { title: "EMPLOYMENT CONTRACT", contractNo: "Contract No.", date: "Date", employeeName: "Employee Name", department: "Department", contractType: "Contract Type", startDate: "Start Date", endDate: "End Date", indefinite: "Indefinite", salary: "Monthly Salary", currency: "IQD", status: "Status", empSig: "Employee Signature", hrSig: "HR Manager Signature", sigDate: "Date", empDetails: "Employee Information", phone: "Phone", email: "Email", gender: "Gender", city: "City", dob: "Date of Birth", position: "Position", workHours: "Work Hours", contractDetails: "Contract Details" },
+      ku: { title: "گرێبەستی کار", contractNo: "ژمارەی گرێبەست", date: "بەروار", employeeName: "ناوی کارمەند", department: "بەش", contractType: "جۆری گرێبەست", startDate: "بەرواری دەستپێکردن", endDate: "بەرواری کۆتایی", indefinite: "بێ کۆتایی", salary: "مووچەی مانگانە", currency: "دینار", status: "دۆخ", empSig: "واژووی کارمەند", hrSig: "واژووی بەڕێوەبەری HR", sigDate: "بەروار", empDetails: "زانیاری کارمەند", phone: "ژمارەی مۆبایل", email: "ئیمەیل", gender: "ڕەگەز", city: "شار", dob: "بەرواری لەدایکبوون", position: "پۆست", workHours: "کاتی کار", contractDetails: "زانیاری گرێبەست" },
+      ar: { title: "عقد عمل", contractNo: "رقم العقد", date: "التاريخ", employeeName: "اسم الموظف", department: "القسم", contractType: "نوع العقد", startDate: "تاريخ البدء", endDate: "تاريخ الانتهاء", indefinite: "غير محدد", salary: "الراتب الشهري", currency: "دينار", status: "الحالة", empSig: "توقيع الموظف", hrSig: "توقيع مدير الموارد البشرية", sigDate: "التاريخ", empDetails: "معلومات الموظف", phone: "الهاتف", email: "البريد الإلكتروني", gender: "الجنس", city: "المدينة", dob: "تاريخ الميلاد", position: "المنصب", workHours: "ساعات العمل", contractDetails: "تفاصيل العقد" },
+    }[lang] || { title: "EMPLOYMENT CONTRACT", contractNo: "Contract No.", date: "Date", employeeName: "Employee Name", department: "Department", contractType: "Contract Type", startDate: "Start Date", endDate: "End Date", indefinite: "Indefinite", salary: "Monthly Salary", currency: "IQD", status: "Status", empSig: "Employee Signature", hrSig: "HR Manager Signature", sigDate: "Date", empDetails: "Employee Information", phone: "Phone", email: "Email", gender: "Gender", city: "City", dob: "Date of Birth", position: "Position", workHours: "Work Hours", contractDetails: "Contract Details" };
 
     const typeMap = {
       en: { Permanent: "Permanent", Temporary: "Temporary", "Part-time": "Part-time", Freelance: "Freelance" },
@@ -136,9 +145,22 @@ export default function Contracts() {
       ku: { Active: "چالاک", Inactive: "ناچالاک", Expired: "بەسەرچووی", "On Leave": "مۆڵەت", Suspended: "ئوقووفکراو" },
       ar: { Active: "نشط", Inactive: "غير نشط", Expired: "منتهي", "On Leave": "في إجازة", Suspended: "موقوف" },
     };
+    const genderMap = {
+      en: { Male: "Male", Female: "Female" },
+      ku: { Male: "نێر", Female: "مێ" },
+      ar: { Male: "ذكر", Female: "أنثى" },
+    };
 
-    const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" }) : L.indefinite;
+    const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" }) : "—";
     const borderSide = isRTL ? "border-right" : "border-left";
+
+    const workHours = empData.work_start && empData.work_end
+      ? `${empData.work_start} — ${empData.work_end}`
+      : "—";
+
+    const avatarHtml = empData.image
+      ? `<img src="${empData.image}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #1a1a2e;" />`
+      : `<div style="width:80px;height:80px;border-radius:50%;background:#EFF6FF;color:#1D4ED8;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;border:2px solid #1a1a2e;">${empData.employee_name ? empData.employee_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) : "?"}</div>`;
 
     const html = `<!DOCTYPE html>
 <html dir="${dir}" lang="${lang}">
@@ -149,10 +171,14 @@ body{font-family:${fontFamily};direction:${dir};background:#fff;color:#1a1a2e;pa
 .header{text-align:center;border-bottom:3px double #1a1a2e;padding-bottom:20px;margin-bottom:28px}
 .title{font-size:24px;font-weight:bold;letter-spacing:2px;margin-bottom:6px}
 .meta{display:flex;justify-content:space-between;margin-bottom:22px;font-size:13px;color:#555}
-.sec-title{font-size:13px;font-weight:bold;background:#f5f5f5;padding:6px 12px;margin-bottom:10px;${borderSide}:4px solid #1a1a2e}
+.sec-title{font-size:13px;font-weight:bold;background:#f5f5f5;padding:6px 12px;margin-bottom:10px;${borderSide}:4px solid #1a1a2e;margin-top:20px}
 .row{display:flex;padding:7px 12px;border-bottom:1px solid #eee;font-size:13px}
 .lbl{font-weight:bold;width:200px;flex-shrink:0;color:#444}
 .val{flex:1}
+.emp-header{display:flex;align-items:center;gap:20px;padding:16px 12px;margin-bottom:4px;background:#f9fafb;border-radius:8px}
+.emp-info{flex:1}
+.emp-info-name{font-size:18px;font-weight:bold;margin-bottom:4px}
+.emp-info-pos{font-size:13px;color:#64748b}
 .sigs{margin-top:64px;display:flex;justify-content:space-between}
 .sig{text-align:center;width:45%}
 .sig-line{border-top:1px solid #333;margin-top:48px;padding-top:7px;font-size:13px;font-weight:bold}
@@ -165,14 +191,32 @@ body{font-family:${fontFamily};direction:${dir};background:#fff;color:#1a1a2e;pa
   <span>${L.contractNo}: ${rec.id ? String(rec.id).padStart(4, "0") : "—"}</span>
   <span>${L.date}: ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}</span>
 </div>
-<div class="sec-title">&nbsp;</div>
-<div class="row"><span class="lbl">${L.employeeName}</span><span class="val">${rec.employee_name || "—"}</span></div>
-<div class="row"><span class="lbl">${L.department}</span><span class="val">${rec.department || "—"}</span></div>
+
+<div class="sec-title">${L.empDetails}</div>
+<div class="emp-header">
+  ${avatarHtml}
+  <div class="emp-info">
+    <div class="emp-info-name">${empData.employee_name || rec.employee_name || "—"}</div>
+    <div class="emp-info-pos">${empData.type_of_job || "—"}</div>
+  </div>
+</div>
+<div class="row"><span class="lbl">${L.employeeName}</span><span class="val">${empData.employee_name || rec.employee_name || "—"}</span></div>
+<div class="row"><span class="lbl">${L.phone}</span><span class="val">${empData.number || "—"}</span></div>
+<div class="row"><span class="lbl">${L.email}</span><span class="val">${empData.email || "—"}</span></div>
+<div class="row"><span class="lbl">${L.gender}</span><span class="val">${(genderMap[lang] || genderMap.en)[empData.gender] || empData.gender || "—"}</span></div>
+<div class="row"><span class="lbl">${L.city}</span><span class="val">${empData.city || "—"}</span></div>
+<div class="row"><span class="lbl">${L.dob}</span><span class="val">${fmtDate(empData.date_of_birth)}</span></div>
+<div class="row"><span class="lbl">${L.position}</span><span class="val">${empData.type_of_job || "—"}</span></div>
+<div class="row"><span class="lbl">${L.department}</span><span class="val">${rec.department || empData.department || "—"}</span></div>
+<div class="row"><span class="lbl">${L.workHours}</span><span class="val">${workHours}</span></div>
+
+<div class="sec-title">${L.contractDetails}</div>
 <div class="row"><span class="lbl">${L.contractType}</span><span class="val">${(typeMap[lang] || typeMap.en)[rec.contract_type] || rec.contract_type || "—"}</span></div>
 <div class="row"><span class="lbl">${L.startDate}</span><span class="val">${fmtDate(rec.start_date)}</span></div>
 <div class="row"><span class="lbl">${L.endDate}</span><span class="val">${rec.end_date ? fmtDate(rec.end_date) : L.indefinite}</span></div>
 <div class="row"><span class="lbl">${L.salary}</span><span class="val">${rec.salary ? Number(rec.salary).toLocaleString() + " " + L.currency : "—"}</span></div>
 <div class="row"><span class="lbl">${L.status}</span><span class="val">${(statusMap[lang] || statusMap.en)[rec.status] || rec.status || "—"}</span></div>
+
 <div class="sigs">
   <div class="sig"><div class="sig-line">${L.empSig}</div><div class="sig-date">${L.sigDate}: ___________</div></div>
   <div class="sig"><div class="sig-line">${L.hrSig}</div><div class="sig-date">${L.sigDate}: ___________</div></div>
@@ -292,7 +336,7 @@ body{font-family:${fontFamily};direction:${dir};background:#fff;color:#1a1a2e;pa
                 </div>
                 <div className="cont-form-field">
                   <Label>{t.cont_fld_end}</Label>
-                  <Input type="date" value={end_date} onChange={e => setEnd_date(e.target.value)} />
+                  <Input type="date" value={end_date} onChange={e => { const v = e.target.value; setEnd_date(v); if (editId && (!v || new Date(v) > new Date(new Date().toDateString()))) setStatus("Active"); }} />
                 </div>
               </div>
               <div className="cont-form-field">

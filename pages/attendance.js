@@ -578,7 +578,11 @@ function AttendanceManagementTab() {
         : await fetch("/api/attendance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (res.status === 409) {
         const body409 = await res.json();
-        if (body409.day_off) { toast.error(t.att_day_off_blocked); return; }
+        if (body409.day_off)   { toast.error(t.att_day_off_blocked); return; }
+        if (body409.holiday)   { toast.error(t.att_holiday_blocked(body409.holiday_name || "This date")); return; }
+        if (body409.on_leave)  { toast.error(t.att_face_on_leave_blocked); return; }
+        if (body409.duplicate) { toast.error(t.att_duplicate_blocked); return; }
+        return;
       }
       if (!res.ok) throw new Error("Failed");
       if (status === "Absent" && !editId) {

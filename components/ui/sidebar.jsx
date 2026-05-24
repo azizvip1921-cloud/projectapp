@@ -281,8 +281,9 @@ function SidebarInset({
       data-slot="sidebar-inset"
       className={cn(
         "bg-background relative flex w-full flex-1 flex-col md:ml-[var(--sidebar-width)]",
-        // In inset variant, expanded (default) shows compact container with margin and rounded
-        "md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm",
+        // Inset variant: rounded card on ALL screen sizes (mobile + desktop)
+        "peer-data-[variant=inset]:m-2 peer-data-[variant=inset]:rounded-xl peer-data-[variant=inset]:shadow-sm",
+        "md:peer-data-[variant=inset]:ml-0",
         // When collapsed to icon, remove margins/decoration so content/table fills the screen
         "md:peer-data-[variant=inset]:peer-data-[state=collapsed]:m-0 md:peer-data-[variant=inset]:peer-data-[state=collapsed]:rounded-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:shadow-none",
         className

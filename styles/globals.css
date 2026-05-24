@@ -5971,7 +5971,8 @@ to {
 .ph-notif-dropdown {
   position:fixed;
   top:60px;
-  right:16px;
+  left:50%;
+  transform:translateX(-50%);
   width:300px;
   background:var(--hr-card);
   border:1px solid var(--hr-border);
@@ -6120,8 +6121,9 @@ to {
 .ph-search-dropdown {
   position:fixed;
   top:60px;
-  right:16px;
-  width:280px;
+  left:50%;
+  transform:translateX(-50%);
+  width:320px;
   background:var(--hr-card);
   border:1px solid var(--hr-border);
   border-radius:10px;
@@ -6785,9 +6787,6 @@ to {
 @media (max-width: 640px) {
   .ph-search-dropdown,
   .ph-notif-dropdown {
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);
     width: calc(100vw - 32px);
     max-width: 420px;
     max-height: 80vh;

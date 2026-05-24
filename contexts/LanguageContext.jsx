@@ -200,6 +200,8 @@ export const translations = {
     att_face_on_leave_blocked:   "This employee is currently on approved leave. Attendance cannot be recorded.",
     att_face_day_off_blocked:    "Today is a day off. Attendance cannot be recorded.",
     att_day_off_blocked:         "This day is set as a day off. Attendance cannot be recorded.",
+    att_holiday_blocked:         (name) => `${name} is a public holiday. Attendance cannot be recorded.`,
+    att_duplicate_blocked:       "Attendance is already recorded for this employee on this date.",
     att_contract_inactive:       (name) => `${name}'s contract has expired and is Inactive. Attendance cannot be recorded.`,
     pay_contract_inactive:       (name) => `${name}'s contract has expired and is Inactive. Salary cannot be processed.`,
     // Attendance tabs
@@ -909,6 +911,8 @@ export const translations = {
     att_face_on_leave_blocked:   "ئەم کارمەندە ئێستا لە مۆڵەتی پەسەندکراودایە. تۆماری ئامادەبوون ناکرێت.",
     att_face_day_off_blocked:    "ئەمڕۆ رۆژی پشووە. تۆماری ئامادەبوون ناکرێت.",
     att_day_off_blocked:         "ئەم رۆژە وەک رۆژی پشوو دانراوە. تۆماری ئامادەبوون ناکرێت.",
+    att_holiday_blocked:         (name) => `${name} جەژنی گشتیە. تۆماری ئامادەبوون ناکرێت.`,
+    att_duplicate_blocked:       "تۆماری ئامادەبوون بۆ ئەم کارمەندە لەم رۆژەدا پێشتر تۆمارکراوە.",
     att_contract_inactive:       (name) => `کۆنتراکتی ${name} تەواو بووە و Inactive ە. تۆماری ئامادەبوون ناکرێت.`,
     pay_contract_inactive:       (name) => `کۆنتراکتی ${name} تەواو بووە و Inactive ە. مووچە ناکرێت بدرێت.`,
     // Attendance tabs
@@ -1600,6 +1604,8 @@ export const translations = {
     att_face_on_leave_blocked:   "هذا الموظف في إجازة معتمدة حالياً. لا يمكن تسجيل الحضور.",
     att_face_day_off_blocked:    "اليوم يوم إجازة. لا يمكن تسجيل الحضور.",
     att_day_off_blocked:         "هذا اليوم محدد كيوم إجازة. لا يمكن تسجيل الحضور.",
+    att_holiday_blocked:         (name) => `${name} عطلة رسمية. لا يمكن تسجيل الحضور.`,
+    att_duplicate_blocked:       "تم تسجيل الحضور مسبقاً لهذا الموظف في هذا التاريخ.",
     att_contract_inactive:       (name) => `عقد ${name} منتهٍ وغير نشط. لا يمكن تسجيل الحضور.`,
     pay_contract_inactive:       (name) => `عقد ${name} منتهٍ وغير نشط. لا يمكن صرف الراتب.`,
     // Attendance tabs

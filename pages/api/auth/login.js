@@ -3,17 +3,6 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
 async function createSession(res, userId, userSource) {
-  await data.query(`
-    CREATE TABLE IF NOT EXISTS \`sessions\` (
-      \`id\`          INT AUTO_INCREMENT PRIMARY KEY,
-      \`token\`       VARCHAR(64) NOT NULL UNIQUE,
-      \`user_id\`     INT NOT NULL,
-      \`user_source\` VARCHAR(20) NOT NULL DEFAULT 'system',
-      \`expires_at\`  DATETIME NOT NULL,
-      \`created_at\`  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `).catch(() => {});
-
   await data.query("DELETE FROM sessions WHERE expires_at < NOW()").catch(() => {});
 
   const token = crypto.randomBytes(32).toString("hex");

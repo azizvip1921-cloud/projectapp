@@ -94,8 +94,13 @@ export default function Savings() {
 
   const adjustExpenditure = async (goal, delta) => {
     const newTarget = Math.max(0, (Number(goal.target) || 0) + delta);
+    const startedStr = goal.started ? String(goal.started).substring(0, 10) : null;
     try {
-      const res = await fetch(`/api/safe/${goal.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...goal, target: newTarget }) });
+      const res = await fetch(`/api/safe/${goal.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: goal.name, target: newTarget, started: startedStr }),
+      });
       if (!res.ok) throw new Error();
       fetchGoals();
     } catch { toast.error(t.sav_toast_err_upd); }

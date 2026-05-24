@@ -6812,8 +6812,8 @@ to {
   /* Savings goals */
   .sav-goals-grid    { grid-template-columns: 1fr; }
 
-  /* Panels */
-  .emp-panel, .hr-panel { width: 100%; }
+  /* Panels — keep emp-panel at 330px (slide-in drawer); hr-panel full width */
+  .hr-panel { width: 100%; }
 
   /* Modal */
   .hr-modal          { padding: 16px; margin: 0; border-radius: 12px; }
@@ -6850,8 +6850,7 @@ to {
   /* Header bar */
   .ph-bar            { padding: 8px 14px; min-height: 52px; }
   .ph-title          { font-size: 15px; }
-  .ph-manager-info   { display: none; }
-  .ph-manager-chip   { padding: 5px 6px; }
+  .ph-manager-chip   { padding: 5px 8px; }
   .ph-search-hint    { display: none; }
   .ph-lang-code      { display: none; }
   .ph-right          { gap: 4px; }

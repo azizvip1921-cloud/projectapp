@@ -6805,41 +6805,40 @@ to {
   .hr-modal          { padding: 16px; margin: 0; border-radius: 12px; }
   .hr-modal-overlay  { padding: 8px; }
 
-  /* Page header: 2-column CSS grid
-     Column 1 = page title (spans ALL rows)
-     Column 2 = action buttons (stack vertically, one group per row) */
+  /* Page header: flex-wrap — title and buttons in same row,
+     buttons wrap below if title is long */
   .hr-ph {
-    display: grid;
-    grid-template-columns: 1fr auto;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    justify-content: space-between;
     gap: 6px 10px;
     padding: 14px 16px 10px;
   }
-  /* Title: column 1, spans every row so it stays centered alongside buttons */
+  /* Title: grows to fill space, never forces shrink */
   .hr-ph > *:first-child {
-    grid-column: 1;
-    grid-row: 1 / span 9;
-    align-self: center;
-    min-width: 0;
+    flex: 1 1 auto;
   }
-  .hr-ph > *:first-child .hr-pt,
-  .hr-ph > *:first-child .hr-ps {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  /* All action containers: column 2, auto-placed per row */
-  .hr-ph > *:not(:first-child) {
-    grid-column: 2;
-  }
-  /* Each action container: 2-column button grid */
-  .ph-main-actions, .ph-extra-actions,
-  .rev-header-actions, .docs-header-actions,
-  .exp-header-actions, .pay-header-actions {
+  /* First action group: 2-column grid, stays right, never shrinks */
+  .ph-main-actions,
+  .rev-header-actions,
+  .docs-header-actions,
+  .exp-header-actions,
+  .pay-header-actions {
     display: grid;
     grid-template-columns: repeat(2, auto);
     gap: 6px;
     align-items: center;
+    flex-shrink: 0;
+  }
+  /* Second action group: own row, pushed right */
+  .ph-extra-actions {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+    margin-inline-start: auto;
   }
 
   /* Header bar */

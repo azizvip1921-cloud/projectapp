@@ -759,14 +759,12 @@ function AttendanceManagementTab() {
                 <Label>{t.att_fld_date}</Label>
                 <Input type="date" value={date} onChange={e => setDate(e.target.value)} required />
               </div>
-              <div className="att-form-grid">
-                <div className="att-form-field">
-                  <Label>{t.att_fld_check_in}</Label>
-                  <Input type="time" value={check_in} onChange={e => { setCheck_in(e.target.value); if (status !== "On Leave") setStatus(getStatusByTime(e.target.value)); }} />
-                </div>
-                <div className="att-form-field">
-                  <Label>{t.att_fld_check_out}</Label>
-                  <Input type="time" value={check_out} onChange={e => setCheck_out(e.target.value)} />
+              <div className="att-form-field">
+                <Label>{t.att_fld_check_in} — {t.att_fld_check_out}</Label>
+                <div className="emp-time-row">
+                  <Input type="time" value={check_in} onChange={e => { setCheck_in(e.target.value); if (status !== "On Leave") setStatus(getStatusByTime(e.target.value)); }} className="emp-time-input" />
+                  <span className="emp-time-sep">—</span>
+                  <Input type="time" value={check_out} onChange={e => setCheck_out(e.target.value)} className="emp-time-input" />
                 </div>
               </div>
               <div className="att-form-field">

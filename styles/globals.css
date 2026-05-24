@@ -6846,6 +6846,13 @@ to {
   .ph-search-hint    { display: none; }
   .ph-lang-code      { display: none; }
   .ph-right          { gap: 4px; }
+
+  /* Time separator more visible on mobile */
+  .emp-time-sep {
+    font-size: 16px;
+    font-weight: 600;
+    color: #475569;
+  }
 }
 
 /* ── Small Mobile (max 480px) ── */

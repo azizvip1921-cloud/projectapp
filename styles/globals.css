@@ -6775,8 +6775,8 @@ to {
   /* Savings mini-box: 2 columns */
   .sav-minibox-grid  { grid-template-columns: repeat(2, 1fr); }
 
-  /* Employee profile stats */
-  .emp-stats-grid    { grid-template-columns: 1fr; }
+  /* Employee profile stats: keep 2×2 grid inside panel */
+  .emp-stats-grid    { grid-template-columns: repeat(2, 1fr); }
 
   /* Forms: single column */
   .rev-form-grid, .emp-form-grid, .att-form-grid, .cont-form-grid,

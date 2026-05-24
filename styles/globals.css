@@ -6782,17 +6782,41 @@ to {
   color: var(--hr-muted);
 }
 
+/* Mobile backdrop for search / notification overlays */
+.ph-mobile-backdrop {
+  display: none;
+}
+
 @media (max-width: 640px) {
+  .ph-mobile-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    z-index: 190;
+  }
+
   .ph-search-dropdown,
   .ph-notif-dropdown {
     position: fixed;
-    top: 52px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     width: calc(100vw - 32px);
     max-width: 420px;
     border-radius: 14px;
     z-index: 200;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ph-search-list,
+  .ph-notif-list {
+    flex: 1;
+    overflow-y: auto;
   }
 
   .dash-stats-grid,

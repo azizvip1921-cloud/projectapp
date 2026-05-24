@@ -451,359 +451,12 @@ to {
 }
 
 /* ════════════════════════════════════════════════
-   RESPONSIVE — Tablet (max 900px)
+   RESPONSIVE — moved to end of file for correct
+   CSS cascade (component CSS is defined later and
+   would otherwise override these rules).
+   See bottom of file for all responsive overrides.
    ════════════════════════════════════════════════ */
-@media (max-width: 900px) {
-  /* Stats grids → 2 columns */
-  .dash-stats-grid,
-  .docs-stats-grid,
-  .rev-stats-grid,
-.pay-stats-grid {
-  grid-template-columns: repeat(2, 1fr);
-}
-.sav-stats-grid {
-  grid-template-columns: repeat(2, 1fr);
-}
-.emp-stat-cards {
-  grid-template-columns: repeat(3, 1fr);
-}
 
-  /* Revenue header wraps */
-  .rev-header-actions,
-  .exp-header-actions,
-.pay-header-actions {
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-  /* Form grids stay 2-col on tablet */
-  .rev-form-grid,
-  .emp-form-grid,
-  .att-form-grid,
-  .cont-form-grid,
-  .docs-form-grid,
-  .exp-form-grid,
-  .pay-form-grid,
-  .req-form-grid,
-.lr-grid-2 {
-  grid-template-columns: 1fr 1fr;
-}
-
-  /* Attendance stats */
-.att-stats-grid {
-  grid-template-columns: repeat(2, 1fr);
-}
-.hr-stat-grid-4 {
-  grid-template-columns: repeat(2, 1fr);
-}
-.hr-stat-grid-3 {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-  /* Page header */
-.ph-title {
-  font-size: 16px;
-}
-
-  /* ── Add / action buttons → compact on tablet ── */
-  .emp-add-btn,
-  .hol-add-btn,
-  .hr-btn,
-  .btn-print {
-    padding: 6px 12px;
-    font-size: 11px;
-  }
-
-  /* ── Date / month inputs → compact on tablet ── */
-  .rev-month-input,
-  .exp-month-input,
-  .pay-month-input,
-  .att-date-input,
-  .hr-date-input {
-    padding: 5px 8px;
-    font-size: 11px;
-  }
-}
-
-/* ════════════════════════════════════════════════
-   RESPONSIVE — Mobile (max 640px)
-   ════════════════════════════════════════════════ */
-@media (max-width: 640px) {
-
-  /* ── Stats grids → 2 columns ── */
-  .dash-stats-grid,
-  .docs-stats-grid,
-  .rev-stats-grid,
-  .sav-stats-grid,
-.pay-stats-grid {
-  grid-template-columns: repeat(2, 1fr);
-}
-.emp-stat-cards {
-  grid-template-columns: repeat(2, 1fr);
-}
-.att-stats-grid {
-  grid-template-columns: repeat(2, 1fr);
-}
-  .hr-stat-grid-4,
-.hr-stat-grid-3 {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-  /* ── Stat card text smaller ── */
-.emp-stat-card__count {
-  font-size: 18px;
-}
-.emp-stat-card__label {
-  font-size: 10px;
-}
-
-  /* ── Page headers: title left, actions right ── */
-  .hr-ph {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 14px 16px 10px;
-  }
-  /* Legacy single-group actions (revenue, documents, safe) */
-  .rev-header-actions,
-  .docs-header-actions,
-  .pay-header-actions {
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-inline-start: auto;
-  }
-  /* Two-row pattern: row 1 right side */
-  .ph-main-actions {
-    gap: 6px;
-  }
-  /* Two-row pattern: row 2, full width, right-aligned */
-  .ph-extra-actions {
-    flex-basis: 100%;
-    justify-content: flex-end;
-    gap: 6px;
-  }
-  /* Compact all header buttons/inputs */
-  .ph-main-actions > *,
-  .ph-extra-actions > *,
-  .rev-header-actions > *,
-  .pay-header-actions > * {
-    font-size: 11px;
-    padding: 5px 10px;
-  }
-  .rev-month-input,
-  .exp-month-input,
-  .pay-month-input,
-  .att-date-input {
-    width: auto;
-    font-size: 11px;
-    padding: 5px 8px;
-  }
-.hr-btn {
-  width: auto;
-  justify-content: center;
-  padding: 5px 10px;
-  font-size: 11px;
-}
-.emp-add-btn,
-.hol-add-btn,
-.btn-print {
-  padding: 5px 10px;
-  font-size: 11px;
-}
-.hr-date-input {
-  width: auto;
-  font-size: 11px;
-  padding: 5px 8px;
-}
-
-  /* ── Charts → 1 column ── */
-.rev-charts-row {
-  grid-template-columns: 1fr;
-}
-.rev-donut-wrap {
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-.rev-cat-bars {
-  width: 100%;
-}
-.rev-cat-bar-label {
-  font-size: 10px;
-  min-width: 50px;
-}
-.rev-chart-card {
-  padding: 12px;
-}
-.rev-chart-title {
-  font-size: 12px;
-}
-
-  /* ── Tables: hide less important columns ── */
-  .rev-tbl-date,
-.rev-tbl-notes {
-  display: none;
-}
-.rev-tbl-actions {
-  flex-direction: column;
-  gap: 3px;
-}
-
-  /* ── Forms → 1 column ── */
-  .rev-form-grid,
-  .emp-form-grid,
-  .att-form-grid,
-  .cont-form-grid,
-  .docs-form-grid,
-  .exp-form-grid,
-  .pay-form-grid,
-  .req-form-grid,
-.lr-grid-2 {
-  grid-template-columns: 1fr;
-}
-
-  /* ── Modal full-width ── */
-.hr-modal {
-  padding: 16px;
-  margin: 0;
-  border-radius: 12px;
-}
-.hr-modal-overlay {
-  padding: 8px;
-}
-
-  /* ── Page Header bar ── */
-.ph-bar {
-  padding: 8px 14px;
-  min-height: 52px;
-}
-.ph-title {
-  font-size: 15px;
-}
-.ph-manager-info {
-  display: none;
-}
-.ph-manager-chip {
-  padding: 5px 6px;
-}
-.ph-search-hint {
-  display: none;
-}
-.ph-lang-code {
-  display: none;
-}
-.ph-right {
-  gap: 4px;
-}
-/* search & notif dropdowns moved to end of file for correct cascade */
-
-  /* ── Attendance tabs → 1 column ── */
-  .att-tab-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 12px 16px;
-  }
-  .att-tab-col {
-    flex-direction: row;
-    padding: 14px 16px;
-    gap: 14px;
-    justify-content: flex-start;
-  }
-.att-tab-col-dot {
-  display: none;
-}
-
-  /* ── Savings goals → 1 column ── */
-.sav-goals-grid {
-  grid-template-columns: 1fr;
-}
-
-  /* ── Employee panel full-width on mobile ── */
-.emp-panel {
-  width: 100%;
-}
-.hr-panel {
-  width: 100%;
-}
-
-  /* ── Dashboard 2-col → single column ── */
-.dash-2col {
-  grid-template-columns: 1fr;
-}
-
-  /* ── Savings mini-box → 2 columns ── */
-.sav-minibox-grid {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-  /* ── Employee profile stats → single column ── */
-.emp-stats-grid {
-  grid-template-columns: 1fr;
-}
-}
-
-/* ════════════════════════════════════════════════
-   RESPONSIVE — Small Mobile (max 480px)
-   ════════════════════════════════════════════════ */
-@media (max-width: 480px) {
-.emp-stat-cards {
-  grid-template-columns: repeat(2, 1fr);
-}
-.emp-stat-card__count {
-  font-size: 16px;
-}
-
-  /* Form footers stack */
-  .rev-form-footer,
-  .emp-form-footer,
-  .att-form-footer,
-  .cont-form-footer,
-  .docs-form-footer,
-  .exp-form-footer,
-  .pay-form-footer,
-  .req-form-footer,
-  .lr-form-actions,
-  .sav-form-footer {
-    flex-direction: column;
-  }
-  .rev-form-footer button,
-  .emp-form-footer button,
-  .att-form-footer button,
-  .cont-form-footer button,
-  .docs-form-footer button,
-  .exp-form-footer button,
-  .pay-form-footer button,
-  .req-form-footer button,
-  .lr-form-actions button,
-  .sav-form-footer button {
-    width: 100%;
-    justify-content: center;
-  }
-
-  /* Table action buttons stack */
-  .rev-tbl-actions,
-  .emp-action-btns,
-  .att-cell-actions,
-  .cont-action-btns,
-  .docs-action-btns,
-  .exp-action-btns,
-  .pay-tbl-actions,
-  .req-tbl-actions,
-.lr-actions {
-  flex-direction: column;
-  gap: 3px;
-}
-
-  /* Stats text */
-.hr-stat-value {
-  font-size: 18px;
-}
-.ph-title {
-  font-size: 14px;
-}
-}
 
 /* ════════════════════════════════════════════════
    Employee Component (emp- prefix)
@@ -7055,4 +6708,172 @@ to {
     background: #fff !important;
     color: #000 !important;
   }
+}
+
+/* ════════════════════════════════════════════════
+   RESPONSIVE — All breakpoints
+   Placed at end of file so they correctly override
+   all component CSS defined above (CSS cascade rule:
+   later = higher priority at equal specificity).
+   ════════════════════════════════════════════════ */
+
+/* ── Tablet (max 900px) ── */
+@media (max-width: 900px) {
+  .dash-stats-grid,
+  .docs-stats-grid,
+  .rev-stats-grid,
+  .pay-stats-grid,
+  .sav-stats-grid,
+  .att-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .emp-stat-cards    { grid-template-columns: repeat(3, 1fr); }
+  .hr-stat-grid-4,
+  .hr-stat-grid-3    { grid-template-columns: repeat(2, 1fr); }
+
+  .rev-form-grid, .emp-form-grid, .att-form-grid, .cont-form-grid,
+  .docs-form-grid, .exp-form-grid, .pay-form-grid, .req-form-grid,
+  .lr-grid-2         { grid-template-columns: 1fr 1fr; }
+
+  .rev-header-actions,
+  .exp-header-actions,
+  .pay-header-actions { flex-wrap: wrap; gap: 8px; }
+
+  .ph-title          { font-size: 16px; }
+
+  .emp-add-btn, .hol-add-btn, .hr-btn, .btn-print {
+    padding: 6px 12px; font-size: 11px;
+  }
+  .rev-month-input, .exp-month-input, .pay-month-input,
+  .att-date-input, .hr-date-input {
+    padding: 5px 8px; font-size: 11px;
+  }
+}
+
+/* ── Mobile (max 640px) ── */
+@media (max-width: 640px) {
+
+  /* Stats: 2 columns */
+  .dash-stats-grid, .docs-stats-grid, .rev-stats-grid,
+  .sav-stats-grid, .pay-stats-grid, .att-stats-grid, .emp-stat-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .hr-stat-grid-4, .hr-stat-grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .emp-stat-card__count { font-size: 18px; }
+  .emp-stat-card__label { font-size: 10px; }
+
+  /* Goal cards: single column (safe.js) */
+  .sav-goals-grid    { grid-template-columns: 1fr; }
+
+  /* Savings content padding */
+  .sav-content       { padding: 0 12px 16px; }
+
+  /* Dashboard */
+  .dash-2col         { grid-template-columns: 1fr; }
+  .dash-body         { padding: 0 12px 16px; gap: 10px; }
+
+  /* Savings mini-box: 2 columns */
+  .sav-minibox-grid  { grid-template-columns: repeat(2, 1fr); }
+
+  /* Employee profile stats */
+  .emp-stats-grid    { grid-template-columns: 1fr; }
+
+  /* Forms: single column */
+  .rev-form-grid, .emp-form-grid, .att-form-grid, .cont-form-grid,
+  .docs-form-grid, .exp-form-grid, .pay-form-grid, .req-form-grid,
+  .lr-grid-2         { grid-template-columns: 1fr; }
+
+  /* Charts */
+  .rev-charts-row    { grid-template-columns: 1fr; }
+  .rev-donut-wrap    { flex-direction: column; align-items: center; gap: 10px; }
+  .rev-cat-bars      { width: 100%; }
+  .rev-cat-bar-label { font-size: 10px; min-width: 50px; }
+  .rev-chart-card    { padding: 12px; }
+  .rev-chart-title   { font-size: 12px; }
+
+  /* Tables: hide less important columns */
+  .rev-tbl-date, .rev-tbl-notes { display: none; }
+  .rev-tbl-actions               { flex-direction: column; gap: 3px; }
+
+  /* Attendance tabs */
+  .att-tab-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+  .att-tab-col {
+    flex-direction: row;
+    padding: 14px 16px;
+    gap: 14px;
+    justify-content: flex-start;
+  }
+  .att-tab-col-dot   { display: none; }
+
+  /* Savings goals */
+  .sav-goals-grid    { grid-template-columns: 1fr; }
+
+  /* Panels */
+  .emp-panel, .hr-panel { width: 100%; }
+
+  /* Modal */
+  .hr-modal          { padding: 16px; margin: 0; border-radius: 12px; }
+  .hr-modal-overlay  { padding: 8px; }
+
+  /* Page header */
+  .hr-ph {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 16px 10px;
+  }
+  .rev-header-actions, .docs-header-actions, .pay-header-actions {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-inline-start: auto;
+  }
+  .ph-main-actions   { gap: 6px; }
+  .ph-extra-actions  { flex-basis: 100%; justify-content: flex-end; gap: 6px; }
+  .ph-main-actions > *, .ph-extra-actions > *,
+  .rev-header-actions > *, .pay-header-actions > * {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+  .rev-month-input, .exp-month-input, .pay-month-input, .att-date-input {
+    width: auto; font-size: 11px; padding: 5px 8px;
+  }
+  .hr-btn            { width: auto; justify-content: center; padding: 5px 10px; font-size: 11px; }
+  .hr-date-input     { width: auto; font-size: 11px; padding: 5px 8px; }
+  .emp-add-btn, .hol-add-btn, .btn-print { padding: 5px 10px; font-size: 11px; }
+
+  /* Header bar */
+  .ph-bar            { padding: 8px 14px; min-height: 52px; }
+  .ph-title          { font-size: 15px; }
+  .ph-manager-info   { display: none; }
+  .ph-manager-chip   { padding: 5px 6px; }
+  .ph-search-hint    { display: none; }
+  .ph-lang-code      { display: none; }
+  .ph-right          { gap: 4px; }
+}
+
+/* ── Small Mobile (max 480px) ── */
+@media (max-width: 480px) {
+  .emp-stat-cards    { grid-template-columns: repeat(2, 1fr); }
+  .emp-stat-card__count { font-size: 16px; }
+  .hr-stat-value     { font-size: 18px; }
+  .ph-title          { font-size: 14px; }
+
+  .rev-form-footer, .emp-form-footer, .att-form-footer, .cont-form-footer,
+  .docs-form-footer, .exp-form-footer, .pay-form-footer, .req-form-footer,
+  .lr-form-actions, .sav-form-footer { flex-direction: column; }
+
+  .rev-form-footer button, .emp-form-footer button, .att-form-footer button,
+  .cont-form-footer button, .docs-form-footer button, .exp-form-footer button,
+  .pay-form-footer button, .req-form-footer button, .lr-form-actions button,
+  .sav-form-footer button { width: 100%; justify-content: center; }
+
+  .rev-tbl-actions, .emp-action-btns, .att-cell-actions, .cont-action-btns,
+  .docs-action-btns, .exp-action-btns, .pay-tbl-actions, .req-tbl-actions,
+  .lr-actions        { flex-direction: column; gap: 3px; }
 }

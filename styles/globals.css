@@ -6805,40 +6805,36 @@ to {
   .hr-modal          { padding: 16px; margin: 0; border-radius: 12px; }
   .hr-modal-overlay  { padding: 8px; }
 
-  /* Page header: flex-wrap — title and buttons in same row,
-     buttons wrap below if title is long */
+  /* Page header: 2-column CSS grid
+     Col 1 = page title (left), Col 2 = all button groups (right, stacked) */
   .hr-ph {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    justify-content: space-between;
     gap: 6px 10px;
     padding: 14px 16px 10px;
   }
-  /* Title: grows to fill space, never forces shrink */
+  /* Title stays in col 1, row 1 — truncates if long so buttons stay right */
   .hr-ph > *:first-child {
-    flex: 1 1 auto;
+    min-width: 0;
   }
-  /* First action group: 2-column grid, stays right, never shrinks */
+  .hr-ph > *:first-child .hr-pt {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* Every action group goes to col 2 — auto-placed into rows 1, 2, 3… */
   .ph-main-actions,
+  .ph-extra-actions,
   .rev-header-actions,
   .docs-header-actions,
   .exp-header-actions,
   .pay-header-actions {
+    grid-column: 2;
     display: grid;
     grid-template-columns: repeat(2, auto);
     gap: 6px;
     align-items: center;
-    flex-shrink: 0;
-  }
-  /* Second action group: own row, pushed right */
-  .ph-extra-actions {
-    display: grid;
-    grid-template-columns: repeat(2, auto);
-    gap: 6px;
-    align-items: center;
-    flex-shrink: 0;
-    margin-inline-start: auto;
   }
 
   /* Header bar */

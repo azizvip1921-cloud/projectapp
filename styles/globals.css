@@ -6798,8 +6798,9 @@ to {
   /* Savings goals */
   .sav-goals-grid    { grid-template-columns: 1fr; }
 
-  /* Panels — keep emp-panel at 330px (slide-in drawer); hr-panel full width */
-  .hr-panel { width: 100%; }
+  /* Panels — emp-panel same width as desktop (330px); hr-panel full width */
+  .emp-panel { width: 330px; }
+  .hr-panel  { width: 100%; }
 
   /* Modal */
   .hr-modal          { padding: 16px; margin: 0; border-radius: 12px; }

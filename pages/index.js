@@ -148,7 +148,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{ padding: "0 20px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
+      <div className="dash-body">
 
         {/* ── 4 Stat Cards ── */}
         <div className="dash-stats-grid">

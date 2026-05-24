@@ -178,6 +178,7 @@ body {
   color: var(--text-body);
   font-family: 'Inter', system-ui, sans-serif;
   transition: var(--transition);
+  overflow-x: hidden;
 }
 
 /* ════════════════════════════════════════════════
@@ -529,7 +530,7 @@ to {
    ════════════════════════════════════════════════ */
 @media (max-width: 640px) {
 
-  /* ── Stats grids → 1 column ── */
+  /* ── Stats grids → 2 columns ── */
   .dash-stats-grid,
   .docs-stats-grid,
   .rev-stats-grid,
@@ -725,6 +726,21 @@ to {
 }
 .hr-panel {
   width: 100%;
+}
+
+  /* ── Dashboard 2-col → single column ── */
+.dash-2col {
+  grid-template-columns: 1fr;
+}
+
+  /* ── Savings mini-box → 2 columns ── */
+.sav-minibox-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+  /* ── Employee profile stats → single column ── */
+.emp-stats-grid {
+  grid-template-columns: 1fr;
 }
 }
 
@@ -4061,6 +4077,20 @@ to {
 }
 .dash-stats-grid {
   grid-template-columns: repeat(5,1fr);
+}
+
+/* Dashboard body wrapper */
+.dash-body {
+  padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+@media (max-width: 640px) {
+  .dash-body {
+    padding: 0 12px 16px;
+    gap: 10px;
+  }
 }
 
 /* Dashboard cards & rows */

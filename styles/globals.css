@@ -6805,33 +6805,49 @@ to {
   .hr-modal          { padding: 16px; margin: 0; border-radius: 12px; }
   .hr-modal-overlay  { padding: 8px; }
 
-  /* Page header: single row — title left, buttons right, no overlap */
+  /* Page header: title left, action buttons right — wraps to new row if needed */
   .hr-ph {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    gap: 8px;
     padding: 14px 16px 10px;
   }
+  /* Title group: takes remaining space, clips long text */
+  .ph-title-group,
   .hr-ph > div:first-child {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
-    overflow: hidden;
   }
-  .hr-ph > div:first-child .hr-pt,
-  .hr-ph > div:first-child .hr-ps {
+  .ph-title-group .hr-pt, .ph-title-group .hr-ps,
+  .hr-ph > div:first-child .hr-pt, .hr-ph > div:first-child .hr-ps {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  /* Header action buttons: 2-column grid on mobile, anchored to the right */
-  .ph-main-actions, .ph-extra-actions,
-  .rev-header-actions, .docs-header-actions,
-  .exp-header-actions, .pay-header-actions {
+  /* Multi-button action containers: 2-column grid, anchored right */
+  .ph-main-actions,
+  .rev-header-actions,
+  .exp-header-actions,
+  .pay-header-actions {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Secondary action row: wraps below, stays right-aligned */
+  .ph-extra-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    flex-shrink: 0;
+    margin-inline-start: auto;
+  }
+
+  /* Single-button pages (Documents): button stays right, no grid */
+  .docs-header-actions {
+    display: flex;
     flex-shrink: 0;
   }
 

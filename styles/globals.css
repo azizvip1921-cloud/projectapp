@@ -6834,8 +6834,30 @@ to {
     grid-column: 2;
     display: grid;
     grid-template-columns: repeat(2, auto);
-    gap: 6px;
+    gap: 5px;
     align-items: center;
+  }
+
+  /* Compact buttons and inputs inside header action groups on mobile */
+  .ph-main-actions .hr-btn,
+  .ph-main-actions .btn-print,
+  .ph-extra-actions .hr-btn,
+  .ph-extra-actions .btn-print,
+  .rev-header-actions .hr-btn,
+  .exp-header-actions .hr-btn,
+  .pay-header-actions .hr-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+    border-radius: 8px;
+  }
+  .ph-main-actions .pay-month-input,
+  .ph-main-actions .exp-month-input,
+  .ph-main-actions .rev-month-input,
+  .ph-main-actions .att-date-input,
+  .ph-main-actions .hr-date-input {
+    padding: 5px 6px;
+    font-size: 11px;
+    max-width: 110px;
   }
 
   /* Header bar */

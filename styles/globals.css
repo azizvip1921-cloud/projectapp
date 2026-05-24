@@ -6805,50 +6805,41 @@ to {
   .hr-modal          { padding: 16px; margin: 0; border-radius: 12px; }
   .hr-modal-overlay  { padding: 8px; }
 
-  /* Page header: title left, action buttons right — wraps to new row if needed */
+  /* Page header: 2-column CSS grid
+     Column 1 = page title (spans ALL rows)
+     Column 2 = action buttons (stack vertically, one group per row) */
   .hr-ph {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    gap: 8px;
+    gap: 6px 10px;
     padding: 14px 16px 10px;
   }
-  /* Title group: takes remaining space, clips long text */
-  .ph-title-group,
-  .hr-ph > div:first-child {
-    flex: 1 1 auto;
+  /* Title: column 1, spans every row so it stays centered alongside buttons */
+  .hr-ph > *:first-child {
+    grid-column: 1;
+    grid-row: 1 / span 9;
+    align-self: center;
     min-width: 0;
   }
-  .ph-title-group .hr-pt, .ph-title-group .hr-ps,
-  .hr-ph > div:first-child .hr-pt, .hr-ph > div:first-child .hr-ps {
+  .hr-ph > *:first-child .hr-pt,
+  .hr-ph > *:first-child .hr-ps {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
-  /* Multi-button action containers: 2-column grid, anchored right */
-  .ph-main-actions,
-  .rev-header-actions,
-  .exp-header-actions,
-  .pay-header-actions {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-    flex-shrink: 0;
+  /* All action containers: column 2, auto-placed per row */
+  .hr-ph > *:not(:first-child) {
+    grid-column: 2;
   }
-
-  /* Secondary action row: wraps below, stays right-aligned */
-  .ph-extra-actions {
+  /* Each action container: 2-column button grid */
+  .ph-main-actions, .ph-extra-actions,
+  .rev-header-actions, .docs-header-actions,
+  .exp-header-actions, .pay-header-actions {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, auto);
     gap: 6px;
-    flex-shrink: 0;
-    margin-inline-start: auto;
-  }
-
-  /* Single-button pages (Documents): button stays right, no grid */
-  .docs-header-actions {
-    display: flex;
-    flex-shrink: 0;
+    align-items: center;
   }
 
   /* Header bar */

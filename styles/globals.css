@@ -6814,9 +6814,10 @@ to {
     gap: 6px 10px;
     padding: 14px 16px 10px;
   }
-  /* Title stays in col 1, row 1 — truncates if long so buttons stay right */
+  /* Title stays in col 1 — overflow:hidden enforces ellipsis on long titles */
   .hr-ph > *:first-child {
     min-width: 0;
+    overflow: hidden;
   }
   .hr-ph > *:first-child .hr-pt {
     white-space: nowrap;

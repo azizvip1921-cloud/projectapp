@@ -6798,8 +6798,8 @@ to {
   /* Savings goals */
   .sav-goals-grid    { grid-template-columns: 1fr; }
 
-  /* Panels — emp-panel same width as desktop (330px); hr-panel full width */
-  .emp-panel { width: 330px; }
+  /* Panels — emp-panel smaller on mobile; hr-panel full width */
+  .emp-panel { width: 280px; }
   .hr-panel  { width: 100%; }
 
   /* Modal */

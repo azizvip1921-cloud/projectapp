@@ -247,6 +247,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     localStorage.removeItem("hr_auth");
     localStorage.removeItem("hr_user");
+    sessionStorage.removeItem("hr_session_pw");
     window.location.replace("/login");
   };
 
@@ -612,7 +613,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer gap-2"
-                onClick={() => { setPwForm({ current: "", next: "", confirm: "" }); setPwError(""); setShowChangePw(true); }}
+                onClick={() => { const sessionPw = sessionStorage.getItem("hr_session_pw") || ""; setPwForm({ current: sessionPw, next: "", confirm: "" }); setPwError(""); setShowChangePw(true); }}
               >
                 <KeyRound size={14} />
                 <span>{t.prof_change_password || "Change Password"}</span>

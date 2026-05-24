@@ -35,10 +35,11 @@ function BadgePill({ count, bg, color }) {
 }
 
 const STATUS_STYLE = {
-  Present: { bg: "#DCFCE7", color: "#15803D" },
-  Early:   { bg: "#DCFCE7", color: "#15803D" },
-  Late:    { bg: "#FEF9C3", color: "#92400E" },
-  Absent:  { bg: "#FEE2E2", color: "#DC2626" },
+  Present:  { bg: "#DCFCE7", color: "#15803D" },
+  Early:    { bg: "#DCFCE7", color: "#15803D" },
+  Late:     { bg: "#FEF9C3", color: "#92400E" },
+  Absent:   { bg: "#FEE2E2", color: "#DC2626" },
+  "On Leave": { bg: "#DBEAFE", color: "#1D4ED8" },
 };
 
 function StatusPill({ status, label }) {
@@ -63,28 +64,12 @@ function RateBar({ rate }) {
   );
 }
 
-function leaveDaysInMonth(leaves, empName, year, month) {
-  const mStart = new Date(year, month, 1);
-  const mEnd   = new Date(year, month + 1, 0);
-  let count = 0;
-  leaves
-    .filter(l => l.employee_name === empName && l.status === "Approved")
-    .forEach(l => {
-      const ls = new Date(l.start_date);
-      const le = new Date(l.end_date);
-      const ov1 = ls > mStart ? ls : mStart;
-      const ov2 = le < mEnd   ? le : mEnd;
-      if (ov1 <= ov2) count += Math.round((ov2 - ov1) / 86400000) + 1;
-    });
-  return count;
-}
 
 export default function AttendanceRecords() {
   const { t, lang } = useLanguage();
   const now = new Date();
   const [records, setRecords]         = useState([]);
   const [employees, setEmployees]     = useState([]);
-  const [leaves, setLeaves]           = useState([]);
   const [selMonth, setSelMonth]       = useState(now.getMonth());
   const [selYear, setSelYear]         = useState(now.getFullYear());
   const [selectedEmp, setSelectedEmp] = useState(null);
@@ -92,7 +77,6 @@ export default function AttendanceRecords() {
   useEffect(() => {
     fetch("/api/attendance").then(r => r.json()).then(d => setRecords(Array.isArray(d) ? d : []));
     fetch("/api/employee").then(r => r.json()).then(d => setEmployees(Array.isArray(d) ? d : d.employees || []));
-    fetch("/api/leaves").then(r => r.json()).then(d => setLeaves(Array.isArray(d) ? d : []));
   }, []);
 
   const monthNames = lang === "ku" ? MONTH_NAMES_KU : lang === "ar" ? MONTH_NAMES_AR : MONTH_NAMES_EN;
@@ -111,7 +95,7 @@ export default function AttendanceRecords() {
     const present  = recs.filter(r => r.status === "Present" || r.status === "Early").length;
     const late     = recs.filter(r => r.status === "Late").length;
     const absent   = recs.filter(r => r.status === "Absent").length;
-    const onLeave  = leaveDaysInMonth(leaves, emp.employee_name, selYear, selMonth);
+    const onLeave  = recs.filter(r => r.status === "On Leave").length;
     const total    = present + late + absent;
     const attended = present + late;
     const rate     = total > 0 ? Math.round((attended / total) * 100) : 0;
@@ -128,7 +112,6 @@ export default function AttendanceRecords() {
   const avgRate      = summary.length ? Math.round(summary.reduce((s, e) => s + e.rate, 0) / summary.length) : 0;
   const totalPresent = summary.reduce((s, e) => s + e.present + e.late, 0);
   const totalAbsent  = summary.reduce((s, e) => s + e.absent, 0);
-  const totalLeave   = summary.reduce((s, e) => s + e.onLeave, 0);
 
   const columns = [
     { key: "num",      label: "#" },
@@ -255,10 +238,11 @@ export default function AttendanceRecords() {
           .filter(r => r.employee_name === selectedEmp.employee_name)
           .sort((a, b) => new Date(a.date) - new Date(b.date));
         const statusLabel = s => ({
-          Present: t.att_present,
-          Early:   t.prof_val_early,
-          Late:    t.att_late,
-          Absent:  t.att_absent,
+          Present:    t.att_present,
+          Early:      t.prof_val_early,
+          Late:       t.att_late,
+          Absent:     t.att_absent,
+          "On Leave": t.rec_col_leave,
         }[s] || s);
         return (
           <div className="hr-modal-overlay">

@@ -111,6 +111,65 @@ export default async function handler(req, res) {
           )
       `);
 
+      // دوێنێ: کارمەندی مۆڵەتی چالاکی هەیە و تۆماری ئامادەبوونی نییە → On Leave
+      await data.query(`
+        INSERT INTO attendance (employee_name, date, check_in, check_out, status)
+        SELECT e.employee_name, DATE_SUB(CURDATE(), INTERVAL 1 DAY), NULL, NULL, 'On Leave'
+        FROM employee e
+        WHERE e.status NOT IN ('Inactive', 'Suspended')
+          AND EXISTS (
+            SELECT 1 FROM working_days wd
+            WHERE wd.day_name = DAYNAME(DATE_SUB(CURDATE(), INTERVAL 1 DAY))
+              AND wd.is_working = 1
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM holidays h
+            WHERE h.date = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM attendance a
+            WHERE a.employee_name = e.employee_name
+              AND DATE(a.date) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+          )
+          AND EXISTS (
+            SELECT 1 FROM leaves l
+            WHERE l.employee_name = e.employee_name
+              AND l.status = 'Approved'
+              AND DATE(l.start_date) <= DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+              AND DATE(l.end_date)   >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+          )
+      `);
+
+      // ئەمڕۆ: دوای کاتی 18:00 — کارمەندی مۆڵەتی چالاکی هەیە و تۆماری ئامادەبوونی نییە → On Leave
+      await data.query(`
+        INSERT INTO attendance (employee_name, date, check_in, check_out, status)
+        SELECT e.employee_name, CURDATE(), NULL, NULL, 'On Leave'
+        FROM employee e
+        WHERE e.status NOT IN ('Inactive', 'Suspended')
+          AND TIME(NOW()) > '18:00:00'
+          AND EXISTS (
+            SELECT 1 FROM working_days wd
+            WHERE wd.day_name = DAYNAME(CURDATE())
+              AND wd.is_working = 1
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM holidays h
+            WHERE h.date = CURDATE()
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM attendance a
+            WHERE a.employee_name = e.employee_name
+              AND DATE(a.date) = CURDATE()
+          )
+          AND EXISTS (
+            SELECT 1 FROM leaves l
+            WHERE l.employee_name = e.employee_name
+              AND l.status = 'Approved'
+              AND DATE(l.start_date) <= CURDATE()
+              AND DATE(l.end_date)   >= CURDATE()
+          )
+      `);
+
       const [rows] = await data.query("SELECT * FROM attendance ORDER BY date DESC");
       res.setHeader("Cache-Control", "no-store, must-revalidate");
       res.status(200).json(rows);

@@ -193,9 +193,9 @@ function PayrollManagementTab() {
             onChange={e => setFilterDate(e.target.value)}
             className="pay-month-input"
           />
-          <button className="btn-print" onClick={() => window.print()} title={t.btn_print}><Printer size={13} /> {t.btn_print}</button>
         </div>
         <div className="ph-extra-actions">
+          <button className="btn-print" onClick={() => window.print()} title={t.btn_print}><Printer size={13} /> {t.btn_print}</button>
           <button className="hr-btn" onClick={() => { resetForm(); setShowForm(true); }}><Plus size={13} /> {t.pay_btn_add}</button>
         </div>
       </div>

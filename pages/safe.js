@@ -162,8 +162,8 @@ export default function Savings() {
           <div className="sav-goals-grid">
             {filteredGoals.map((g, i) => {
               const color = GOAL_COLORS[i % GOAL_COLORS.length];
-              const pct = g.target > 0 ? Math.min(Math.round((totalExpenditure / Number(g.target)) * 100), 100) : 0;
-              const remaining = Number(g.target) - totalExpenditure;
+              const pct = totalTarget > 0 ? Math.min(Math.round((totalExpenditure / totalTarget) * 100), 100) : 0;
+              const remaining = totalTarget - totalExpenditure;
               return (
                 <div key={g.id} className="sav-goal-card">
                   <div className="sav-card-header">

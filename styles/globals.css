@@ -6734,20 +6734,6 @@ to {
   .rev-form-grid, .emp-form-grid, .att-form-grid, .cont-form-grid,
   .docs-form-grid, .exp-form-grid, .pay-form-grid, .req-form-grid,
   .lr-grid-2         { grid-template-columns: 1fr 1fr; }
-
-  .rev-header-actions,
-  .exp-header-actions,
-  .pay-header-actions { flex-wrap: wrap; gap: 8px; }
-
-  .ph-title          { font-size: 16px; }
-
-  .emp-add-btn, .hol-add-btn, .hr-btn, .btn-print {
-    padding: 6px 12px; font-size: 11px;
-  }
-  .rev-month-input, .exp-month-input, .pay-month-input,
-  .att-date-input, .hr-date-input {
-    padding: 5px 8px; font-size: 11px;
-  }
 }
 
 /* ── Mobile (max 640px) ── */
@@ -6818,34 +6804,6 @@ to {
   /* Modal */
   .hr-modal          { padding: 16px; margin: 0; border-radius: 12px; }
   .hr-modal-overlay  { padding: 8px; }
-
-  /* Page header */
-  .hr-ph {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 14px 16px 10px;
-  }
-  .rev-header-actions, .docs-header-actions, .pay-header-actions {
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-inline-start: auto;
-  }
-  .ph-main-actions   { gap: 6px; }
-  .ph-extra-actions  { flex-basis: 100%; justify-content: flex-end; gap: 6px; }
-  .ph-main-actions > *, .ph-extra-actions > *,
-  .rev-header-actions > *, .pay-header-actions > * {
-    font-size: 11px;
-    padding: 5px 10px;
-  }
-  .rev-month-input, .exp-month-input, .pay-month-input, .att-date-input {
-    width: auto; font-size: 11px; padding: 5px 8px;
-  }
-  .hr-btn            { width: auto; justify-content: center; padding: 5px 10px; font-size: 11px; }
-  .hr-date-input     { width: auto; font-size: 11px; padding: 5px 8px; }
-  .emp-add-btn, .hol-add-btn, .btn-print { padding: 5px 10px; font-size: 11px; }
 
   /* Header bar */
   .ph-bar            { padding: 8px 14px; min-height: 52px; }

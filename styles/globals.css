@@ -6805,21 +6805,34 @@ to {
   .hr-modal          { padding: 16px; margin: 0; border-radius: 12px; }
   .hr-modal-overlay  { padding: 8px; }
 
-  /* Page header: wrap title above buttons */
+  /* Page header: single row — title left, buttons right, no overlap */
   .hr-ph {
-    flex-wrap: wrap;
-    align-items: flex-start;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
     padding: 14px 16px 10px;
   }
+  .hr-ph > div:first-child {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .hr-ph > div:first-child .hr-pt,
+  .hr-ph > div:first-child .hr-ps {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-  /* Header action buttons: 2-column grid on mobile */
+  /* Header action buttons: 2-column grid on mobile, anchored to the right */
   .ph-main-actions, .ph-extra-actions,
   .rev-header-actions, .docs-header-actions,
   .exp-header-actions, .pay-header-actions {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    width: 100%;
+    gap: 6px;
+    flex-shrink: 0;
   }
 
   /* Header bar */

@@ -102,6 +102,7 @@ export default function Savings() {
         body: JSON.stringify({ name: goal.name, target: newTarget, started: startedStr }),
       });
       if (!res.ok) throw new Error();
+      toast.success(t.sav_toast_update);
       fetchGoals();
     } catch { toast.error(t.sav_toast_err_upd); }
   };

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
@@ -49,6 +50,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const notifRef = useRef(null);
+  const notifBtnRef = useRef(null);
   const seenNotifIds = useRef(null);
 
   const [searchOpen, setSearchOpen] = useState(false);
@@ -56,6 +58,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
   const [allEmployees, setAllEmployees] = useState([]);
   const [allDocuments, setAllDocuments] = useState([]);
   const searchRef = useRef(null);
+  const searchBtnRef = useRef(null);
   const searchInputRef = useRef(null);
 
   const NAV_PAGES = [
@@ -170,7 +173,9 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
   useEffect(() => {
     if (!notifOpen) return;
     const handler = (e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false);
+      const inDropdown = notifRef.current?.contains(e.target);
+      const inBtn = notifBtnRef.current?.contains(e.target);
+      if (!inDropdown && !inBtn) setNotifOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -186,7 +191,9 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
       if (Array.isArray(rows)) setAllDocuments(rows);
     }).catch(() => {});
     const handler = (e) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
+      const inDropdown = searchRef.current?.contains(e.target);
+      const inBtn = searchBtnRef.current?.contains(e.target);
+      if (!inDropdown && !inBtn) {
         setSearchOpen(false);
         setSearchQuery("");
       }
@@ -349,137 +356,22 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
         <div className="ph-right">
           {children && <div className="ph-children">{children}</div>}
 
-          {/* Global Search */}
-          <div className="ph-search-wrap" ref={searchRef}>
+          {/* Global Search — button only, dropdown portaled to body */}
+          <div className="ph-search-wrap">
             <button
+              ref={searchBtnRef}
               className="ph-icon-btn"
               onClick={() => { setSearchOpen(v => !v); setSearchQuery(""); }}
               title="Search (Ctrl+K)"
             >
               <Search size={16} />
             </button>
-            {searchOpen && (
-              <div className="ph-search-dropdown">
-                <div className="ph-search-input-wrap">
-                  <Search size={14} className="ph-search-icon" />
-                  <input
-                    ref={searchInputRef}
-                    className="ph-search-input"
-                    placeholder={t.search_placeholder || "Search anything…"}
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                  />
-                  {searchQuery && (
-                    <button className="ph-search-clear" onClick={() => setSearchQuery("")}>✕</button>
-                  )}
-                </div>
-
-                <div className="ph-search-list">
-                  {!q ? (
-                    <div className="ph-search-empty ph-search-hint-msg">
-                      <Search size={22} style={{ opacity: 0.25, marginBottom: 8 }} />
-                      <div>{t.search_hint || "Search pages, settings, employees, documents…"}</div>
-                    </div>
-                  ) : totalResults === 0 ? (
-                    <div className="ph-search-empty">{t.search_no_results || "No results found"}</div>
-                  ) : (
-                    <>
-                      {/* Pages */}
-                      {filteredPages.length > 0 && (
-                        <>
-                          <div className="ph-search-section-label">{t.search_pages || "Pages"}</div>
-                          {filteredPages.map(page => {
-                            const Icon = page.icon;
-                            return (
-                              <div key={page.href} className="ph-search-item"
-                                onClick={() => { setSearchOpen(false); setSearchQuery(""); router.push(page.href); }}>
-                                <div className="ph-search-item-icon-wrap ph-search-item-icon--page">
-                                  <Icon size={13} />
-                                </div>
-                                <span>{page.label}</span>
-                              </div>
-                            );
-                          })}
-                        </>
-                      )}
-
-                      {/* Settings */}
-                      {filteredSettings.length > 0 && (
-                        <>
-                          <div className="ph-search-section-label">{t.nav_settings || "Settings"}</div>
-                          {filteredSettings.map(s => {
-                            const Icon = s.icon;
-                            return (
-                              <div key={s.href} className="ph-search-item"
-                                onClick={() => { setSearchOpen(false); setSearchQuery(""); router.push(s.href); }}>
-                                <div className="ph-search-item-icon-wrap ph-search-item-icon--setting">
-                                  <Icon size={13} />
-                                </div>
-                                <span>{s.label}</span>
-                                <span className="ph-search-item-tag">{t.nav_settings || "Settings"}</span>
-                              </div>
-                            );
-                          })}
-                        </>
-                      )}
-
-                      {/* Employees */}
-                      {filteredEmployees.length > 0 && (
-                        <>
-                          <div className="ph-search-section-label">{t.nav_employees || "Employees"}</div>
-                          {filteredEmployees.map(emp => (
-                            <div key={emp.id} className="ph-search-item"
-                              onClick={() => { setSearchOpen(false); setSearchQuery(""); router.push(`/employee?edit=${emp.id}`); }}>
-                              <div className="ph-search-emp-avatar">
-                                {emp.image
-                                  ? <img src={emp.image} alt="" />
-                                  : emp.employee_name?.charAt(0).toUpperCase()}
-                              </div>
-                              <div className="ph-search-emp-info">
-                                <span className="ph-search-emp-name">{emp.employee_name}</span>
-                                {(emp.type_of_job || emp.department) && (
-                                  <span className="ph-search-emp-role">{emp.type_of_job || emp.department}</span>
-                                )}
-                              </div>
-                              <span className={`ph-search-emp-status ph-search-emp-status--${(emp.status || "").toLowerCase().replace(" ", "-")}`}>
-                                {emp.status}
-                              </span>
-                            </div>
-                          ))}
-                        </>
-                      )}
-
-                      {/* Documents */}
-                      {filteredDocuments.length > 0 && (
-                        <>
-                          <div className="ph-search-section-label">{t.nav_documents || "Documents"}</div>
-                          {filteredDocuments.map(doc => {
-                            const DocIcon = DOC_TYPE_ICONS[doc.type] || File;
-                            return (
-                              <div key={doc.id} className="ph-search-item"
-                                onClick={() => { setSearchOpen(false); setSearchQuery(""); router.push("/documents"); }}>
-                                <div className={`ph-search-item-icon-wrap ph-search-item-icon--doc ph-search-doc--${(doc.type || "other").toLowerCase()}`}>
-                                  <DocIcon size={13} />
-                                </div>
-                                <div className="ph-search-emp-info">
-                                  <span className="ph-search-emp-name">{doc.name}</span>
-                                  <span className="ph-search-emp-role">{doc.employee}{doc.type ? ` · ${doc.type}` : ""}</span>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Notification Bell */}
-          <div className="ph-notif-wrap" ref={notifRef}>
+          {/* Notification Bell — button only, dropdown portaled to body */}
+          <div className="ph-notif-wrap">
             <button
+              ref={notifBtnRef}
               className="ph-icon-btn"
               style={{ position: "relative" }}
               onClick={() => setNotifOpen(v => !v)}
@@ -492,47 +384,6 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
                 </span>
               )}
             </button>
-
-            {notifOpen && (
-              <div className="ph-notif-dropdown">
-                <div className="ph-notif-header">
-                  <span>{t.notif_title || "Notifications"}</span>
-                  {notifications.length > 0 && (
-                    <span className="ph-notif-count">{notifications.length}</span>
-                  )}
-                </div>
-                <div className="ph-notif-list">
-                  {notifications.length === 0 ? (
-                    <div className="ph-notif-empty">{t.notif_empty || "No new notifications"}</div>
-                  ) : (
-                    notifications.slice(0, 10).map(n => {
-                      const Icon = n.type === "leave" ? Calendar : n.type === "request" ? FileText : DollarSign;
-                      return (
-                        <div
-                          key={n.id}
-                          className="ph-notif-item"
-                          onClick={() => { setNotifOpen(false); router.push(n.href); }}
-                        >
-                          <div className={`ph-notif-icon ph-notif-icon--${n.type}`}>
-                            <Icon size={14} />
-                          </div>
-                          <div className="ph-notif-body">
-                            <div className="ph-notif-name">{n.title}</div>
-                            <div className="ph-notif-sub">{n.sub}</div>
-                          </div>
-                          <span className="ph-notif-pending">{t.lbl_pending || "Pending"}</span>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-                {notifications.length > 10 && (
-                  <div className="ph-notif-footer">
-                    +{notifications.length - 10} {t.notif_more || "more"}
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Language switcher */}
@@ -631,6 +482,145 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
           </DropdownMenu>
         </div>
       </div>
+
+      {/* ── Search dropdown — portaled to body so overflow-y:auto on SidebarInset doesn't clip it ── */}
+      {mounted && searchOpen && createPortal(
+        <div className="ph-search-dropdown" ref={searchRef}>
+          <div className="ph-search-input-wrap">
+            <Search size={14} className="ph-search-icon" />
+            <input
+              ref={searchInputRef}
+              className="ph-search-input"
+              placeholder={t.search_placeholder || "Search anything…"}
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button className="ph-search-clear" onClick={() => setSearchQuery("")}>✕</button>
+            )}
+          </div>
+          <div className="ph-search-list">
+            {!q ? (
+              <div className="ph-search-empty ph-search-hint-msg">
+                <Search size={22} style={{ opacity: 0.25, marginBottom: 8 }} />
+                <div>{t.search_hint || "Search pages, settings, employees, documents…"}</div>
+              </div>
+            ) : totalResults === 0 ? (
+              <div className="ph-search-empty">{t.search_no_results || "No results found"}</div>
+            ) : (
+              <>
+                {filteredPages.length > 0 && (
+                  <>
+                    <div className="ph-search-section-label">{t.search_pages || "Pages"}</div>
+                    {filteredPages.map(page => {
+                      const Icon = page.icon;
+                      return (
+                        <div key={page.href} className="ph-search-item"
+                          onClick={() => { setSearchOpen(false); setSearchQuery(""); router.push(page.href); }}>
+                          <div className="ph-search-item-icon-wrap ph-search-item-icon--page"><Icon size={13} /></div>
+                          <span>{page.label}</span>
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
+                {filteredSettings.length > 0 && (
+                  <>
+                    <div className="ph-search-section-label">{t.nav_settings || "Settings"}</div>
+                    {filteredSettings.map(s => {
+                      const Icon = s.icon;
+                      return (
+                        <div key={s.href} className="ph-search-item"
+                          onClick={() => { setSearchOpen(false); setSearchQuery(""); router.push(s.href); }}>
+                          <div className="ph-search-item-icon-wrap ph-search-item-icon--setting"><Icon size={13} /></div>
+                          <span>{s.label}</span>
+                          <span className="ph-search-item-tag">{t.nav_settings || "Settings"}</span>
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
+                {filteredEmployees.length > 0 && (
+                  <>
+                    <div className="ph-search-section-label">{t.nav_employees || "Employees"}</div>
+                    {filteredEmployees.map(emp => (
+                      <div key={emp.id} className="ph-search-item"
+                        onClick={() => { setSearchOpen(false); setSearchQuery(""); router.push(`/employee?edit=${emp.id}`); }}>
+                        <div className="ph-search-emp-avatar">
+                          {emp.image ? <img src={emp.image} alt="" /> : emp.employee_name?.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="ph-search-emp-info">
+                          <span className="ph-search-emp-name">{emp.employee_name}</span>
+                          {(emp.type_of_job || emp.department) && (
+                            <span className="ph-search-emp-role">{emp.type_of_job || emp.department}</span>
+                          )}
+                        </div>
+                        <span className={`ph-search-emp-status ph-search-emp-status--${(emp.status || "").toLowerCase().replace(" ", "-")}`}>
+                          {emp.status}
+                        </span>
+                      </div>
+                    ))}
+                  </>
+                )}
+                {filteredDocuments.length > 0 && (
+                  <>
+                    <div className="ph-search-section-label">{t.nav_documents || "Documents"}</div>
+                    {filteredDocuments.map(doc => {
+                      const DocIcon = DOC_TYPE_ICONS[doc.type] || File;
+                      return (
+                        <div key={doc.id} className="ph-search-item"
+                          onClick={() => { setSearchOpen(false); setSearchQuery(""); router.push("/documents"); }}>
+                          <div className={`ph-search-item-icon-wrap ph-search-item-icon--doc ph-search-doc--${(doc.type || "other").toLowerCase()}`}>
+                            <DocIcon size={13} />
+                          </div>
+                          <div className="ph-search-emp-info">
+                            <span className="ph-search-emp-name">{doc.name}</span>
+                            <span className="ph-search-emp-role">{doc.employee}{doc.type ? ` · ${doc.type}` : ""}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ── Notification dropdown — portaled to body ── */}
+      {mounted && notifOpen && createPortal(
+        <div className="ph-notif-dropdown" ref={notifRef}>
+          <div className="ph-notif-header">
+            <span>{t.notif_title || "Notifications"}</span>
+            {notifications.length > 0 && <span className="ph-notif-count">{notifications.length}</span>}
+          </div>
+          <div className="ph-notif-list">
+            {notifications.length === 0 ? (
+              <div className="ph-notif-empty">{t.notif_empty || "No new notifications"}</div>
+            ) : (
+              notifications.slice(0, 10).map(n => {
+                const Icon = n.type === "leave" ? Calendar : n.type === "request" ? FileText : DollarSign;
+                return (
+                  <div key={n.id} className="ph-notif-item" onClick={() => { setNotifOpen(false); router.push(n.href); }}>
+                    <div className={`ph-notif-icon ph-notif-icon--${n.type}`}><Icon size={14} /></div>
+                    <div className="ph-notif-body">
+                      <div className="ph-notif-name">{n.title}</div>
+                      <div className="ph-notif-sub">{n.sub}</div>
+                    </div>
+                    <span className="ph-notif-pending">{t.lbl_pending || "Pending"}</span>
+                  </div>
+                );
+              })
+            )}
+          </div>
+          {notifications.length > 10 && (
+            <div className="ph-notif-footer">+{notifications.length - 10} {t.notif_more || "more"}</div>
+          )}
+        </div>,
+        document.body
+      )}
     </>
   );
 }

@@ -5969,15 +5969,15 @@ to {
   line-height:1;
 }
 .ph-notif-dropdown {
-  position:absolute;
-  top:calc(100% + 8px);
-  right:0;
+  position:fixed;
+  top:60px;
+  right:16px;
   width:300px;
   background:var(--hr-card);
   border:1px solid var(--hr-border);
   border-radius:12px;
   box-shadow:0 8px 32px rgba(0,0,0,0.15);
-  z-index:50;
+  z-index:9999;
   overflow:hidden;
 }
 .ph-notif-header {
@@ -6118,15 +6118,15 @@ to {
   letter-spacing:0.03em;
 }
 .ph-search-dropdown {
-  position:absolute;
-  top:calc(100% + 8px);
-  right:0;
+  position:fixed;
+  top:60px;
+  right:16px;
   width:280px;
   background:var(--hr-card);
   border:1px solid var(--hr-border);
   border-radius:10px;
   box-shadow:0 8px 24px rgba(0,0,0,0.13);
-  z-index:200;
+  z-index:9999;
   overflow:hidden;
 }
 .ph-search-input-wrap {
@@ -6785,17 +6785,15 @@ to {
 @media (max-width: 640px) {
   .ph-search-dropdown,
   .ph-notif-dropdown {
-    position: fixed;
-    top: 60px;
+    right: auto;
     left: 50%;
     transform: translateX(-50%);
     width: calc(100vw - 32px);
     max-width: 420px;
-    border-radius: 14px;
-    z-index: 200;
     max-height: 80vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   .ph-search-list,

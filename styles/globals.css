@@ -6805,6 +6805,23 @@ to {
   .hr-modal          { padding: 16px; margin: 0; border-radius: 12px; }
   .hr-modal-overlay  { padding: 8px; }
 
+  /* Page header: wrap title above buttons */
+  .hr-ph {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 14px 16px 10px;
+  }
+
+  /* Header action buttons: 2-column grid on mobile */
+  .ph-main-actions, .ph-extra-actions,
+  .rev-header-actions, .docs-header-actions,
+  .exp-header-actions, .pay-header-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
   /* Header bar */
   .ph-bar            { padding: 8px 14px; min-height: 52px; }
   .ph-title          { font-size: 15px; }

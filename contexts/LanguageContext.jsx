@@ -315,6 +315,7 @@ export const translations = {
     exp_toast_err: "An error occurred",
     exp_toast_err_upd: "Failed to update expense",
     exp_toast_err_del: "Failed to delete expense",
+    exp_del_item: "expense",
     // Leave Requests
     leave_title: "Leave Requests",
     leave_sub: (n) => `${n} total requests`,
@@ -1023,6 +1024,7 @@ export const translations = {
     exp_toast_err: "هەڵەیەک ڕوویدا",
     exp_toast_err_upd: "نوێکردنەوەی خەرجی سەرکەوتوو نەبوو",
     exp_toast_err_del: "سڕینەوەی خەرجی سەرکەوتوو نەبوو",
+    exp_del_item: "خەرجی",
     // Leave Requests
     leave_title: "داواکاریی مۆڵەت",
     leave_sub: (n) => `${n} داواکاری کۆی گشتی`,
@@ -1713,6 +1715,7 @@ export const translations = {
     exp_toast_err: "حدث خطأ",
     exp_toast_err_upd: "فشل تحديث المصروف",
     exp_toast_err_del: "فشل حذف المصروف",
+    exp_del_item: "مصروف",
     // Leave Requests
     leave_title: "طلبات الإجازة",
     leave_sub: (n) => `${n} طلب إجمالي`,

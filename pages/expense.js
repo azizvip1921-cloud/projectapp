@@ -65,17 +65,17 @@ export default function Expenses() {
         const res = await fetch(`/api/expenses/${editId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
         if (!res.ok) throw new Error();
         setRecords(prev => prev.map(r => r.id === editId ? { ...r, ...body } : r));
-        toast.success("Updated");
+        toast.success(t.exp_toast_update);
       } else {
         const res = await fetch("/api/expenses", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
         if (!res.ok) throw new Error();
         const result = await res.json();
         const newRecord = { id: result.id, ...body };
         setRecords(prev => [newRecord, ...prev]);
-        toast.success("Expense added");
+        toast.success(t.exp_toast_add);
       }
       resetForm();
-    } catch { toast.error("An error occurred"); }
+    } catch { toast.error(t.exp_toast_err); }
   };
 
   const resetForm = () => {
@@ -96,10 +96,10 @@ export default function Expenses() {
       const rec = records.find(r => r.id === id);
       const res = await fetch(`/api/expenses/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...rec, status: newStatus }) });
       if (!res.ok) throw new Error();
-      toast.success(`Expense ${newStatus.toLowerCase()}`);
+      toast.success(newStatus === "Approved" ? t.exp_toast_approved : t.exp_toast_rejected);
     } catch {
       setRecords(previous);
-      toast.error("Failed to update");
+      toast.error(t.exp_toast_err_upd);
     }
   };
 
@@ -109,10 +109,10 @@ export default function Expenses() {
     try {
       const res = await fetch(`/api/expenses/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
-      toast.success("Deleted");
+      toast.success(t.exp_toast_delete);
     } catch {
       setRecords(previous);
-      toast.error("Failed to delete");
+      toast.error(t.exp_toast_err_del);
     }
   };
 
@@ -218,7 +218,7 @@ export default function Expenses() {
                     <button className="hr-btn-sm hr-btn-rej"  onClick={() => updateStatus(rec.id, "Rejected")}>{t.btn_reject}</button>
                   </>}
                   <button className="hr-btn-sm hr-btn-edit" onClick={() => prepareEdit(rec)}>{t.btn_edit}</button>
-                  <DeleteConfirmDialog onConfirm={() => deleteRecord(rec.id)} itemName="expense" />
+                  <DeleteConfirmDialog onConfirm={() => deleteRecord(rec.id)} itemName={t.exp_del_item} />
                 </div>
               </TableCell>
             </TableRow>

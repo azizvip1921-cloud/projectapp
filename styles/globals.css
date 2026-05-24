@@ -6824,7 +6824,8 @@ to {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  /* Every action group goes to col 2 — auto-placed into rows 1, 2, 3… */
+  /* Every action group goes to col 2 — auto-placed into rows 1, 2, 3…
+     display:flex keeps buttons at their exact natural (desktop) width */
   .ph-main-actions,
   .ph-extra-actions,
   .rev-header-actions,
@@ -6832,8 +6833,7 @@ to {
   .exp-header-actions,
   .pay-header-actions {
     grid-column: 2;
-    display: grid;
-    grid-template-columns: repeat(2, auto);
+    display: flex;
     gap: 6px;
     align-items: center;
   }

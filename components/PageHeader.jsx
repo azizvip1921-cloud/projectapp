@@ -336,17 +336,6 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
         </DialogContent>
       </Dialog>
 
-      {(searchOpen || notifOpen) && (
-        <div
-          className="ph-mobile-backdrop"
-          onClick={() => {
-            setSearchOpen(false);
-            setSearchQuery("");
-            setNotifOpen(false);
-          }}
-        />
-      )}
-
       <div className="ph-bar">
         {/* ── Left: sidebar trigger + title ── */}
         <div className="ph-left">

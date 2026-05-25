@@ -344,6 +344,11 @@ function FaceScanner({ mode, employees, onClose, fetchRecords }) {
         updatePhase("day_off");
         return;
       }
+      if (action === "after_hours") {
+        setResult({ employee_name: data.employee_name, action: "after_hours" });
+        updatePhase("after_hours");
+        return;
+      }
       setResult({ employee_name: data.employee_name, total_days: data.total_days, action, status: recStatus });
       updatePhase("success");
       fetchRecords();
@@ -355,7 +360,20 @@ function FaceScanner({ mode, employees, onClose, fetchRecords }) {
     const now  = new Date();
     const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
     const today = localToday();
-    if (!todayRec) {
+    const currentMins = now.getHours() * 60 + now.getMinutes();
+
+    // Auto-absent = system-inserted row with no check_in
+    const isAutoAbsent = todayRec && !todayRec.check_in;
+
+    if (!todayRec || isAutoAbsent) {
+      // After 18:00 → block check-in, keep the Absent record as-is
+      if (currentMins >= 18 * 60) {
+        return { action: "after_hours", status: null };
+      }
+      // Before 18:00 → delete auto-absent if it exists, then create real check_in
+      if (isAutoAbsent) {
+        await fetch(`/api/attendance/${todayRec.id}`, { method: "DELETE" });
+      }
       const autoStatus = getStatusByTime(time);
       const res = await fetch("/api/attendance", {
         method: "POST",
@@ -457,6 +475,15 @@ function FaceScanner({ mode, employees, onClose, fetchRecords }) {
             <div className="att-face-on-leave-icon">📅</div>
             <div className="att-face-on-leave-name">{result.employee_name}</div>
             <div className="att-face-on-leave-msg">{t.att_face_day_off_blocked}</div>
+            <button onClick={onClose} className="att-face-close-btn">{t.att_face_close}</button>
+          </div>
+        )}
+
+        {phase === "after_hours" && result && (
+          <div className="att-face-on-leave">
+            <div className="att-face-on-leave-icon">🕕</div>
+            <div className="att-face-on-leave-name">{result.employee_name}</div>
+            <div className="att-face-on-leave-msg">{t.att_after_hours_blocked}</div>
             <button onClick={onClose} className="att-face-close-btn">{t.att_face_close}</button>
           </div>
         )}
@@ -570,6 +597,11 @@ function AttendanceManagementTab() {
     e.preventDefault();
     if (contractInactive && !editId) { toast.error(t.att_contract_inactive(employee_name)); return; }
     if (activeLeave && !editId) { toast.error(t.att_on_leave_banner(employee_name, activeLeave.end_date.slice(0, 10))); return; }
+    const _now = new Date();
+    if (!editId && date === localToday() && (_now.getHours() * 60 + _now.getMinutes()) >= 18 * 60 && status !== "Absent" && status !== "On Leave") {
+      toast.error(t.att_after_hours_blocked);
+      return;
+    }
     if (!employee_name || !date || !status) { toast.warning(t.lbl_required); return; }
     const body = { employee_name, date, check_in, check_out, status };
     try {

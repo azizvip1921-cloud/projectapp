@@ -88,8 +88,11 @@ export default function DataTable({ columns, data, renderRow, renderCard, viewMo
                 pageData.map((item, index) => renderRow(item, start + index))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                    No results found.
+                  <TableCell colSpan={columns.length} className="h-32 text-center">
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, color: "#94A3B8" }}>
+                      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                      <span style={{ fontSize: 14, fontWeight: 500 }}>No results found.</span>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}

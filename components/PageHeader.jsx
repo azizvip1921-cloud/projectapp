@@ -279,6 +279,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
       });
       const data = await res.json();
       if (!res.ok) { setPwError(data.error === "wrong_password" ? (t.prof_change_password_wrong || "Current password is incorrect") : (data.error || "Error")); return; }
+      sessionStorage.setItem("hr_session_pw", pwForm.next);
       setShowChangePw(false);
     } catch { setPwError("Server error"); }
     finally { setPwLoading(false); }

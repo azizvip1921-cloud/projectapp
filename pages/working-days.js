@@ -62,7 +62,7 @@ export default function WorkingDays() {
   const [saving,  setSaving]  = useState(null);
 
   useEffect(() => {
-    fetch("/api/working-days")
+    fetch("/api/working-days", { cache: "no-store" })
       .then(r => r.json())
       .then(d => { setDays(Array.isArray(d) ? d : []); setLoading(false); })
       .catch(() => setLoading(false));

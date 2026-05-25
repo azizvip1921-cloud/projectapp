@@ -4,6 +4,11 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
 
+      // دڵنیابوون لەوەی ستوونی status بتوانێت 'On Leave' هەڵبگرێت
+      try {
+        await data.query(`ALTER TABLE attendance MODIFY COLUMN status VARCHAR(20) NOT NULL DEFAULT 'Present'`);
+      } catch (_) {}
+
       // کارمەندی مۆڵەتی چالاکی هەیە → On Leave
       try {
         await data.query(`
@@ -122,68 +127,55 @@ export default async function handler(req, res) {
         `);
       } catch (e) { console.error("Auto-insert today Absent failed:", e.message); }
 
-      // دوێنێ: کارمەندی مۆڵەتی چالاکی هەیە و تۆماری ئامادەبوونی نییە → On Leave
+      // هەموو رۆژەکانی مۆڵەت → On Leave (رۆژی تێپەڕ بێ مەرج، ئەمڕۆ دوای 18:00)
       try {
         await data.query(`
           INSERT INTO attendance (employee_name, date, check_in, check_out, status)
-          SELECT e.employee_name, DATE_SUB(CURDATE(), INTERVAL 1 DAY), NULL, NULL, 'On Leave'
-          FROM employee e
-          WHERE e.status NOT IN ('Inactive', 'Suspended')
+          SELECT DISTINCT l.employee_name, d.d, NULL, NULL, 'On Leave'
+          FROM (
+            SELECT CURDATE() - INTERVAL n DAY AS d
+            FROM (
+              SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+              UNION ALL SELECT 4  UNION ALL SELECT 5  UNION ALL SELECT 6  UNION ALL SELECT 7
+              UNION ALL SELECT 8  UNION ALL SELECT 9  UNION ALL SELECT 10 UNION ALL SELECT 11
+              UNION ALL SELECT 12 UNION ALL SELECT 13 UNION ALL SELECT 14 UNION ALL SELECT 15
+              UNION ALL SELECT 16 UNION ALL SELECT 17 UNION ALL SELECT 18 UNION ALL SELECT 19
+              UNION ALL SELECT 20 UNION ALL SELECT 21 UNION ALL SELECT 22 UNION ALL SELECT 23
+              UNION ALL SELECT 24 UNION ALL SELECT 25 UNION ALL SELECT 26 UNION ALL SELECT 27
+              UNION ALL SELECT 28 UNION ALL SELECT 29 UNION ALL SELECT 30 UNION ALL SELECT 31
+              UNION ALL SELECT 32 UNION ALL SELECT 33 UNION ALL SELECT 34 UNION ALL SELECT 35
+              UNION ALL SELECT 36 UNION ALL SELECT 37 UNION ALL SELECT 38 UNION ALL SELECT 39
+              UNION ALL SELECT 40 UNION ALL SELECT 41 UNION ALL SELECT 42 UNION ALL SELECT 43
+              UNION ALL SELECT 44 UNION ALL SELECT 45 UNION ALL SELECT 46 UNION ALL SELECT 47
+              UNION ALL SELECT 48 UNION ALL SELECT 49 UNION ALL SELECT 50 UNION ALL SELECT 51
+              UNION ALL SELECT 52 UNION ALL SELECT 53 UNION ALL SELECT 54 UNION ALL SELECT 55
+              UNION ALL SELECT 56 UNION ALL SELECT 57 UNION ALL SELECT 58 UNION ALL SELECT 59
+            ) n_tbl
+          ) d
+          JOIN leaves l
+            ON d.d >= DATE(l.start_date)
+           AND d.d <= DATE(l.end_date)
+          WHERE l.status = 'Approved'
+            AND d.d <= CURDATE()
+            AND (d.d < CURDATE() OR TIME(NOW()) > '18:00:00')
+            AND EXISTS (
+              SELECT 1 FROM employee e
+              WHERE e.employee_name = l.employee_name
+                AND e.status NOT IN ('Inactive', 'Suspended')
+            )
             AND EXISTS (
               SELECT 1 FROM working_days wd
-              WHERE wd.day_name = DAYNAME(DATE_SUB(CURDATE(), INTERVAL 1 DAY))
-                AND wd.is_working = 1
+              WHERE wd.day_name = DAYNAME(d.d) AND wd.is_working = 1
             )
             AND NOT EXISTS (
-              SELECT 1 FROM holidays h
-              WHERE h.date = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+              SELECT 1 FROM holidays h WHERE h.date = d.d
             )
             AND NOT EXISTS (
               SELECT 1 FROM attendance a
-              WHERE a.employee_name = e.employee_name
-                AND DATE(a.date) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
-            )
-            AND EXISTS (
-              SELECT 1 FROM leaves l
-              WHERE l.employee_name = e.employee_name
-                AND l.status = 'Approved'
-                AND DATE(l.start_date) <= DATE_SUB(CURDATE(), INTERVAL 1 DAY)
-                AND DATE(l.end_date)   >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+              WHERE a.employee_name = l.employee_name AND DATE(a.date) = d.d
             )
         `);
-      } catch (e) { console.error("Auto-insert yesterday On Leave failed:", e.message); }
-
-      // ئەمڕۆ: دوای کاتی 18:00 — کارمەندی مۆڵەتی چالاکی هەیە و تۆماری ئامادەبوونی نییە → On Leave
-      try {
-        await data.query(`
-          INSERT INTO attendance (employee_name, date, check_in, check_out, status)
-          SELECT e.employee_name, CURDATE(), NULL, NULL, 'On Leave'
-          FROM employee e
-          WHERE e.status NOT IN ('Inactive', 'Suspended')
-            AND TIME(NOW()) > '18:00:00'
-            AND EXISTS (
-              SELECT 1 FROM working_days wd
-              WHERE wd.day_name = DAYNAME(CURDATE())
-                AND wd.is_working = 1
-            )
-            AND NOT EXISTS (
-              SELECT 1 FROM holidays h
-              WHERE h.date = CURDATE()
-            )
-            AND NOT EXISTS (
-              SELECT 1 FROM attendance a
-              WHERE a.employee_name = e.employee_name
-                AND DATE(a.date) = CURDATE()
-            )
-            AND EXISTS (
-              SELECT 1 FROM leaves l
-              WHERE l.employee_name = e.employee_name
-                AND l.status = 'Approved'
-                AND DATE(l.start_date) <= CURDATE()
-                AND DATE(l.end_date)   >= CURDATE()
-            )
-        `);
-      } catch (e) { console.error("Auto-insert today On Leave failed:", e.message); }
+      } catch (e) { console.error("Auto-insert On Leave failed:", e.message); }
 
       const [rows] = await data.query("SELECT * FROM attendance ORDER BY date DESC");
       res.setHeader("Cache-Control", "no-store, must-revalidate");

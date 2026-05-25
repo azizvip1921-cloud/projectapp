@@ -3680,6 +3680,10 @@ to {
   font-size: 11px;
   color: #64748B;
 }
+.rev-mobile-detail-row { display: none; }
+.rev-mobile-detail-cell { padding: 2px 10px 6px !important; border-top: none !important; }
+.rev-mobile-date { font-size: 11px; color: #94A3B8; }
+.rev-mobile-notes { font-size: 11px; color: #64748B; margin-left: 10px; font-style: italic; }
 .rev-tbl-actions {
   display: flex;
   gap: 4px;
@@ -6780,9 +6784,7 @@ to {
   .rev-chart-card    { padding: 12px; }
   .rev-chart-title   { font-size: 12px; }
 
-  /* Tables: hide less important columns */
-  .rev-tbl-date, .rev-tbl-notes { display: none; }
-  .rev-tbl-actions               { flex-direction: column; gap: 3px; }
+  .rev-tbl-actions { flex-direction: column; gap: 3px; }
 
   /* Attendance tabs */
   .att-tab-grid {

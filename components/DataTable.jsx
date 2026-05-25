@@ -79,7 +79,7 @@ export default function DataTable({ columns, data, renderRow, renderCard, viewMo
             <TableHeader>
               <TableRow>
                 {columns.map((col) => (
-                  <TableHead key={col.key}>{col.label}</TableHead>
+                  <TableHead key={col.key} className={col.className || ""}>{col.label}</TableHead>
                 ))}
               </TableRow>
             </TableHeader>

@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { ThemeProvider } from "next-themes";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -14,35 +15,40 @@ export default function App({ Component, pageProps }) {
   const isLoginPage = router.pathname === "/login";
 
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-      storageKey="app-theme"
-    >
-      <LanguageProvider>
-        <TooltipProvider>
-          <SidebarProvider>
-            <FormVisibilityProvider>
-              {isLoginPage ? (
-                <div className="login-page-wrapper">
-                  <Component {...pageProps} />
-                </div>
-              ) : (
-                <>
-                  <AppSidebar />
-                  <SidebarInset className="min-w-0 overflow-y-auto">
-                    <PageHeader alwaysShow />
+    <>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+      </Head>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+        storageKey="app-theme"
+      >
+        <LanguageProvider>
+          <TooltipProvider>
+            <SidebarProvider>
+              <FormVisibilityProvider>
+                {isLoginPage ? (
+                  <div className="login-page-wrapper">
                     <Component {...pageProps} />
-                  </SidebarInset>
-                </>
-              )}
-              <Toaster position="top-center" richColors closeButton />
-            </FormVisibilityProvider>
-          </SidebarProvider>
-        </TooltipProvider>
-      </LanguageProvider>
-    </ThemeProvider>
+                  </div>
+                ) : (
+                  <>
+                    <AppSidebar />
+                    <SidebarInset className="min-w-0 overflow-y-auto">
+                      <PageHeader alwaysShow />
+                      <Component {...pageProps} />
+                    </SidebarInset>
+                  </>
+                )}
+                <Toaster position="top-center" richColors closeButton />
+              </FormVisibilityProvider>
+            </SidebarProvider>
+          </TooltipProvider>
+        </LanguageProvider>
+      </ThemeProvider>
+    </>
   );
 }

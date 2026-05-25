@@ -69,9 +69,10 @@ export default function EmployeeSalaries() {
   function buildSummary(emp, idx, empRecs) {
     const paid    = empRecs.filter(r => r.status === "Paid");
     const pending = empRecs.filter(r => r.status === "Pending");
-    const totalPaid    = paid.reduce((s, r) => s + (Number(r.net) || 0), 0);
-    const totalPending = pending.reduce((s, r) => s + (Number(r.net) || 0), 0);
-    const sortedPaid   = [...paid].sort((a, b) => new Date(b.payment_date || b.month) - new Date(a.payment_date || a.month));
+    const totalPaid       = paid.reduce((s, r) => s + (Number(r.net) || 0), 0);
+    const totalPending    = pending.reduce((s, r) => s + (Number(r.net) || 0), 0);
+    const totalDeductions = empRecs.reduce((s, r) => s + (Number(r.deductions) || 0), 0);
+    const sortedPaid      = [...paid].sort((a, b) => new Date(b.payment_date || b.month) - new Date(a.payment_date || a.month));
     return {
       id:            emp.id,
       employee_name: emp.employee_name,
@@ -82,6 +83,7 @@ export default function EmployeeSalaries() {
       pendingCount:  pending.length,
       totalPaid,
       totalPending,
+      totalDeductions,
       lastPaymentDate: sortedPaid[0] ? (sortedPaid[0].payment_date || sortedPaid[0].month) : null,
       ac:         AVATAR_COLORS[idx % AVATAR_COLORS.length],
       allRecords: [...empRecs].sort((a, b) => new Date(b.payment_date || b.month) - new Date(a.payment_date || a.month)),
@@ -107,10 +109,10 @@ export default function EmployeeSalaries() {
     return matchEmp && matchSearch;
   });
 
-  const totalNetPaid   = summary.reduce((s, e) => s + e.totalPaid,    0);
-  const totalNetPend   = summary.reduce((s, e) => s + e.totalPending, 0);
-  const totalPaidCount = summary.reduce((s, e) => s + e.paidCount,    0);
-  const totalPendCount = summary.reduce((s, e) => s + e.pendingCount, 0);
+  const totalNetPaid      = summary.reduce((s, e) => s + e.totalPaid,        0);
+  const totalNetDeductions = summary.reduce((s, e) => s + e.totalDeductions, 0);
+  const totalPaidCount    = summary.reduce((s, e) => s + e.paidCount,        0);
+  const totalPendCount    = summary.reduce((s, e) => s + e.pendingCount,     0);
 
   // Columns for summary view (all employees)
   const summaryColumns = [
@@ -118,7 +120,7 @@ export default function EmployeeSalaries() {
     { key: "employee",      label: t.col_employee },
     { key: "records",       label: t.pay_sal_col_records },
     { key: "total_paid",    label: t.pay_sal_col_total_paid },
-    { key: "total_pending", label: t.pay_sal_col_total_pending },
+    { key: "total_pending", label: t.pay_sal_col_total_deduction },
     { key: "last_payment",  label: t.pay_sal_col_last_payment },
     { key: "action",        label: t.col_actions },
   ];
@@ -223,7 +225,7 @@ export default function EmployeeSalaries() {
             </div>
             <div className="emp-stat-card emp-stat-card--suspended">
               <div className="emp-stat-card__icon"><FileText size={18} /></div>
-              <div className="emp-stat-card__count">{totalNetPend.toLocaleString()} IQD</div>
+              <div className="emp-stat-card__count">{totalNetDeductions.toLocaleString()} IQD</div>
               <div className="emp-stat-card__label">{t.pay_stat_deductions}</div>
             </div>
           </div>
@@ -334,8 +336,8 @@ export default function EmployeeSalaries() {
                   </TableCell>
 
                   <TableCell>
-                    <span className="pay-tbl-pending">
-                      {emp.totalPending > 0 ? `${emp.totalPending.toLocaleString()} IQD` : "—"}
+                    <span className="pay-tbl-deductions">
+                      {emp.totalDeductions > 0 ? `${emp.totalDeductions.toLocaleString()} IQD` : "—"}
                     </span>
                   </TableCell>
 

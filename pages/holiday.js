@@ -53,7 +53,7 @@ function HolidayModal({ holiday, t, onClose }) {
 
         {/* Header */}
         <div className="hol-modal-hdr">
-          <button onClick={onClose} className="hol-modal-close">×</button>
+          <button onClick={onClose} className="hol-modal-close">✕</button>
 
           <div className="hol-modal-hdr-row">
             <div className="hol-modal-icon">

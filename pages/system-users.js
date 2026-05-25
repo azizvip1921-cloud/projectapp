@@ -82,7 +82,7 @@ export default function UsersPage() {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await fetch("/api/system-users");
+      const res = await fetch("/api/system-users", { cache: "no-store" });
       const d = await res.json();
       setUsers(Array.isArray(d) ? d : []);
     } catch { toast.error(t.usr_toast_load_err); }

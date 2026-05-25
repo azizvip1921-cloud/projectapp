@@ -219,12 +219,12 @@ function PayrollManagementTab() {
 
       <div className="flex flex-1 flex-col gap-4 p-4 shiny-ring">
         <div className="pay-stats-grid">
-          <div className="emp-stat-card emp-stat-card--all">
+          <div className="emp-stat-card emp-stat-card--active">
             <div className="emp-stat-card__icon"><DollarSign size={18} /></div>
             <div className="emp-stat-card__count">{totalIQD.toLocaleString()} IQD</div>
             <div className="emp-stat-card__label">{t.pay_stat_total}</div>
           </div>
-          <div className="emp-stat-card emp-stat-card--active">
+          <div className="emp-stat-card emp-stat-card--all">
             <div className="emp-stat-card__icon"><CheckCircle size={18} /></div>
             <div className="emp-stat-card__count">{paid}</div>
             <div className="emp-stat-card__label">{t.pay_stat_paid}</div>

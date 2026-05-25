@@ -3640,6 +3640,28 @@ to {
   align-items: center;
   gap: 10px;
 }
+.rev-month-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.rev-month-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1.5px solid var(--hr-border);
+  background: var(--hr-card2);
+  color: var(--hr-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.rev-month-nav-btn:hover {
+  background: var(--hr-border);
+  color: var(--hr-text);
+}
 .rev-month-input {
   padding: 6px 28px 6px 10px;
   border-radius: 8px;

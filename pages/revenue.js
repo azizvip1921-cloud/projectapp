@@ -30,32 +30,38 @@ function Badge({ text }) {
   return <span className="hr-badge" style={{ background: c.bg, color: c.color }}>{tv(text) || "—"}</span>;
 }
 
-function MonthlyTrendChart({ records }) {
-  const now = new Date();
-  const months = Array.from({ length: 8 }, (_, i) => {
-    const d = new Date(now.getFullYear(), now.getMonth() - 7 + i, 1);
-    return { key: d.toISOString().slice(0, 7), label: d.toLocaleString("en", { month: "short" }) };
+function MonthlyTrendChart({ records, selectedMonth }) {
+  const [selY, selM] = selectedMonth.split("-").map(Number);
+  const months = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(selY, selM - 1 - 5 + i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    return { key, label: d.toLocaleString("en", { month: "short" }) };
   });
   const vals = months.map(m => records.filter(r => r.date && String(r.date).startsWith(m.key)).reduce((s, r) => s + Number(r.amount || 0), 0));
-  const maxV = Math.max(...vals, 1);
-  const W = 300, H = 100, pad = 10, bw = 26, gap = 6, barH = H - 22;
+  const nonZero = vals.filter(v => v > 0);
+  const maxV = nonZero.length > 0 ? Math.max(...nonZero) : 1;
+  const W = 280, H = 110, pad = 8, bw = 32, gap = 8, barH = H - 26;
   return (
     <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", overflow: "visible" }}>
       {vals.map((v, i) => {
         const x = pad + i * (bw + gap);
-        const h = Math.max(Math.round((v / maxV) * barH), v > 0 ? 4 : 3);
+        const h = v > 0 ? Math.max(Math.round((v / maxV) * barH), 6) : 3;
         const y = barH - h;
-        const isCurrent = months[i].key === now.toISOString().slice(0, 7);
-        const col = isCurrent ? "#2563EB" : "#10B981";
+        const isSelected = months[i].key === selectedMonth;
+        const col = isSelected ? "#2563EB" : "#10B981";
         return (
           <g key={months[i].key}>
-            <rect x={x} y={y} width={bw} height={h} rx="5" fill={col} opacity={isCurrent ? 1 : 0.72} />
+            <rect x={x} y={v > 0 ? y : barH - 3} width={bw} height={h} rx="5"
+              fill={v > 0 ? col : "#E2E8F0"} opacity={isSelected ? 1 : 0.72} />
             {v > 0 && (
-              <text x={x + bw / 2} y={y - 4} textAnchor="middle" fontSize="7" fill="#94A3B8">
+              <text x={x + bw / 2} y={y - 4} textAnchor="middle" fontSize="8" fill="#94A3B8">
                 {v >= 1000000 ? (v / 1000000).toFixed(1) + "M" : v >= 1000 ? (v / 1000).toFixed(0) + "K" : v}
               </text>
             )}
-            <text x={x + bw / 2} y={H} textAnchor="middle" fontSize="8" fill="#94A3B8">{months[i].label}</text>
+            <text x={x + bw / 2} y={H} textAnchor="middle" fontSize="9" fill={isSelected ? "#2563EB" : "#94A3B8"}
+              fontWeight={isSelected ? "700" : "400"}>
+              {months[i].label}
+            </text>
           </g>
         );
       })}
@@ -69,9 +75,13 @@ function DonutChart({ records }) {
   const totals = cats.map(c => records.filter(r => r.category === c).reduce((s, r) => s + Number(r.amount || 0), 0));
   const grand = totals.reduce((a, b) => a + b, 0) || 1;
   const cx = 40, cy = 40, r = 32, innerR = 20;
+  const nonZeroCount = totals.filter(v => v > 0).length;
   let offset = 0;
   const paths = totals.map((v, i) => {
     if (v === 0) return null;
+    if (nonZeroCount === 1) {
+      return <circle key={cats[i]} cx={cx} cy={cy} r={r} fill={cols[i]} opacity="0.88" />;
+    }
     const pct = v / grand;
     const angle = pct * 2 * Math.PI;
     const x1 = cx + r * Math.sin(offset), y1 = cy - r * Math.cos(offset);
@@ -143,11 +153,13 @@ export default function Revenue() {
   };
 
   const total = records.reduce((s, r) => s + Number(r.amount || 0), 0);
-  const thisMonth = localMonth();
-  const monthTotal = records.filter(r => r.date && String(r.date).startsWith(thisMonth)).reduce((s, r) => s + Number(r.amount || 0), 0);
+  const monthRecords = records.filter(r => r.date && String(r.date).startsWith(filterDate));
+  const monthTotal = monthRecords.reduce((s, r) => s + Number(r.amount || 0), 0);
+  const monthCount = monthRecords.length;
+  const monthCatCount = new Set(monthRecords.map(r => r.category)).size;
 
   const byCategory = CATEGORIES.map(cat => ({
-    cat, total: records.filter(r => r.category === cat).reduce((s, r) => s + Number(r.amount || 0), 0),
+    cat, total: monthRecords.filter(r => r.category === cat).reduce((s, r) => s + Number(r.amount || 0), 0),
   })).filter(c => c.total > 0);
   const maxCat = Math.max(...byCategory.map(c => c.total), 1);
 
@@ -198,12 +210,12 @@ export default function Revenue() {
           </div>
           <div className="emp-stat-card emp-stat-card--purple">
             <div className="emp-stat-card__icon"><FileText size={18} /></div>
-            <div className="emp-stat-card__count">{records.length}</div>
+            <div className="emp-stat-card__count">{monthCount}</div>
             <div className="emp-stat-card__label">{t.rev_transactions}</div>
           </div>
           <div className="emp-stat-card emp-stat-card--onleave">
             <div className="emp-stat-card__icon"><BarChart3 size={18} /></div>
-            <div className="emp-stat-card__count">{new Set(records.map(r => r.category)).size}</div>
+            <div className="emp-stat-card__count">{monthCatCount}</div>
             <div className="emp-stat-card__label">{t.rev_stat_topcat}</div>
           </div>
         </div>
@@ -213,13 +225,13 @@ export default function Revenue() {
           {/* Monthly Trend */}
           <div className="rev-chart-card">
             <div className="rev-chart-title">{t.rev_monthly_trend}</div>
-            <MonthlyTrendChart records={records} />
+            <MonthlyTrendChart records={records} selectedMonth={filterDate} />
           </div>
           {/* By Category */}
           <div className="rev-chart-card">
             <div className="rev-chart-title">{t.rev_by_category}</div>
             <div className="rev-donut-wrap">
-              <DonutChart records={records} />
+              <DonutChart records={monthRecords} />
               <div className="rev-cat-bars">
                 {byCategory.length === 0
                   ? <span className="rev-no-data">{t.lbl_no_data}</span>

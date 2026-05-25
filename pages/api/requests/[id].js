@@ -6,9 +6,10 @@ export default async function handler(req, res) {
   if (req.method === "PUT") {
     try {
       const { employee_name, request_type, subject, submitted_date, status, notes } = req.body;
+      const cleanDate = submitted_date ? String(submitted_date).slice(0, 10) : null;
       await data.query(
         "UPDATE requests SET employee_name=?, request_type=?, subject=?, submitted_date=?, status=?, notes=? WHERE id=?",
-        [employee_name, request_type || "Transfer Request", subject, submitted_date || null, status || "Pending", notes || null, id]
+        [employee_name, request_type || "Transfer Request", subject, cleanDate, status || "Pending", notes || null, id]
       );
       res.status(200).json({ success: true });
     } catch (error) {

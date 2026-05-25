@@ -89,9 +89,13 @@ export default function EmployeeProfilePanel({
 
   useEffect(() => {
     if (!employee) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTab("info");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEmpAttendance([]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEmpLeaves([]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEmpDocs([]);
     fetch("/api/attendance")
       .then(r => r.json())

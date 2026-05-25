@@ -63,6 +63,7 @@ export default function EmployeeSalaries() {
     if (!loaded || !router.query.emp) return;
     const name = decodeURIComponent(router.query.emp);
     const emp  = employees.find(e => e.employee_name === name);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (emp) setEmpFilter(name);
   }, [loaded, router.query.emp]);
 

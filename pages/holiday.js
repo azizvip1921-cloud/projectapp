@@ -28,6 +28,7 @@ function HolidayModal({ holiday, t, onClose }) {
 
   useEffect(() => {
     if (!holiday) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoadingEmp(true);
     fetch("/api/employee")
       .then(r => r.json())

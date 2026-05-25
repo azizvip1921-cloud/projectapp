@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
-import { Sun, Moon, Globe, User, LogOut, ChevronDown, KeyRound, Bell, Calendar, FileText, DollarSign, Search, Users, ClipboardList, Briefcase, CreditCard, TrendingUp, ShieldCheck, Clock, FileCheck, Settings, Wallet, Building2, Palette, Database, Wifi, CalendarDays, File, LayoutDashboard, Inbox, Receipt, CalendarOff} from "lucide-react";
+import { Sun, Moon, Globe, User, LogOut, ChevronDown, KeyRound, Bell, Calendar, FileText, DollarSign, Search, Users, ClipboardList, Briefcase, CreditCard, TrendingUp, ShieldCheck, Clock, FileCheck, Settings, Wallet, Building2, Palette, Database, Wifi, CalendarDays, File, LayoutDashboard, Inbox, Receipt, CalendarOff, Eye, EyeOff } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useFormVisibility } from "@/components/FormVisibilityContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -45,6 +45,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
   const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
   const [pwError, setPwError] = useState("");
   const [pwLoading, setPwLoading] = useState(false);
+  const [showPw, setShowPw] = useState({ next: false, confirm: false });
   const { lang, switchLang, t } = useLanguage();
 
   const [notifOpen, setNotifOpen] = useState(false);
@@ -326,11 +327,21 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
             </div>
             <div>
               <Label htmlFor="cp-new">{t.prof_change_password_new || "New Password"}</Label>
-              <Input id="cp-new" type="password" autoComplete="new-password" value={pwForm.next} onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))} style={{ marginTop: 4 }} />
+              <div style={{ position: "relative", marginTop: 4 }}>
+                <Input id="cp-new" type={showPw.next ? "text" : "password"} autoComplete="new-password" value={pwForm.next} onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))} style={{ paddingInlineEnd: "2.4rem" }} />
+                <button type="button" onClick={() => setShowPw(p => ({ ...p, next: !p.next }))} tabIndex={-1} style={{ position: "absolute", insetInlineEnd: "0.6rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--muted-foreground)", padding: 0, lineHeight: 1 }}>
+                  {showPw.next ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
             </div>
             <div>
               <Label htmlFor="cp-confirm">{t.prof_change_password_confirm || "Confirm New Password"}</Label>
-              <Input id="cp-confirm" type="password" autoComplete="new-password" value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))} style={{ marginTop: 4 }} />
+              <div style={{ position: "relative", marginTop: 4 }}>
+                <Input id="cp-confirm" type={showPw.confirm ? "text" : "password"} autoComplete="new-password" value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))} style={{ paddingInlineEnd: "2.4rem" }} />
+                <button type="button" onClick={() => setShowPw(p => ({ ...p, confirm: !p.confirm }))} tabIndex={-1} style={{ position: "absolute", insetInlineEnd: "0.6rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--muted-foreground)", padding: 0, lineHeight: 1 }}>
+                  {showPw.confirm ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
             </div>
             {pwError && <div style={{ color: "#DC2626", fontSize: 12 }}>{pwError}</div>}
             <button

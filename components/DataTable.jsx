@@ -22,6 +22,7 @@ export default function DataTable({ columns, data, renderRow, renderCard, viewMo
   const [page, setPage]         = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setPage(1); }, [data, pageSize]);
 
   const totalPages = Math.max(1, Math.ceil(data.length / pageSize));

@@ -17,33 +17,28 @@ export default function ThemeSwitcher() {
 
   // Avoid rendering theme-dependent UI on the server to prevent hydration mismatch
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
-
-  // Determine which icon to show based on current theme (only after mount)
-  const getThemeIcon = () => {
-    if (!mounted) return null;
-    if (theme === "dark") return Moon;
-    if (theme === "system") return Monitor;
-    return Sun;
-  };
-
-  const ThemeIcon = getThemeIcon();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="icon" 
+        <Button
+          variant="outline"
+          size="icon"
           className={`h-11 w-11 rounded-full border-2 ${
             theme === "system" ? "border-blue-500" : ""
           }`}
         >
-          {ThemeIcon ? (
-            <ThemeIcon className="h-5 w-5" />
-          ) : (
+          {!mounted ? (
             <span className="h-5 w-5 inline-block" aria-hidden="true" />
+          ) : theme === "dark" ? (
+            <Moon className="h-5 w-5" />
+          ) : theme === "system" ? (
+            <Monitor className="h-5 w-5" />
+          ) : (
+            <Sun className="h-5 w-5" />
           )}
           <span className="sr-only">Toggle theme</span>
         </Button>

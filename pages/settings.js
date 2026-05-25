@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import {
   Building2, Palette, Database,
   KeyRound, Wifi, Save, RefreshCw, Download, CalendarDays,
+  Eye, EyeOff,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -98,6 +99,7 @@ export default function SettingsPage() {
   /* Password */
   const [pw, setPw]               = useState({ current: "", next: "", confirm: "" });
   const [pwLoading, setPwLoading] = useState(false);
+  const [showPw, setShowPw]       = useState({ next: false, confirm: false });
 
   /* Database */
   const [dbLoading, setDbLoading] = useState(false);
@@ -319,17 +321,39 @@ export default function SettingsPage() {
           {/* Change Password */}
           <SectionCard id="settings-password" icon="password" title={t.set_pw_title} sub={t.set_pw_sub}>
             <div className="rev-form-grid settings-form-grid">
-              {pwFields.map(f => (
-                <div className="rev-form-field" key={f.key}>
-                  <Label className="settings-label">{f.label}</Label>
-                  <Input
-                    type="password"
-                    value={pw[f.key]}
-                    onChange={e => setPw(p => ({ ...p, [f.key]: e.target.value }))}
-                    placeholder="••••••••"
-                  />
-                </div>
-              ))}
+              {pwFields.map(f => {
+                const canToggle = f.key === "next" || f.key === "confirm";
+                const visible   = canToggle && showPw[f.key];
+                return (
+                  <div className="rev-form-field" key={f.key}>
+                    <Label className="settings-label">{f.label}</Label>
+                    <div style={{ position: "relative" }}>
+                      <Input
+                        type={visible ? "text" : "password"}
+                        value={pw[f.key]}
+                        onChange={e => setPw(p => ({ ...p, [f.key]: e.target.value }))}
+                        placeholder="••••••••"
+                        style={canToggle ? { paddingInlineEnd: "2.4rem" } : undefined}
+                      />
+                      {canToggle && (
+                        <button
+                          type="button"
+                          onClick={() => setShowPw(p => ({ ...p, [f.key]: !p[f.key] }))}
+                          style={{
+                            position: "absolute", insetInlineEnd: "0.6rem",
+                            top: "50%", transform: "translateY(-50%)",
+                            background: "none", border: "none", cursor: "pointer",
+                            color: "var(--muted-foreground)", padding: 0, lineHeight: 1,
+                          }}
+                          tabIndex={-1}
+                        >
+                          {visible ? <EyeOff size={15} /> : <Eye size={15} />}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
             <div className="settings-card-footer">
               <button className="hr-btn" onClick={changePassword} disabled={pwLoading}

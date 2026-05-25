@@ -71,7 +71,7 @@ export default function EmployeeSalaries() {
     const pending = empRecs.filter(r => r.status === "Pending");
     const totalPaid       = paid.reduce((s, r) => s + (Number(r.net) || 0), 0);
     const totalPending    = pending.reduce((s, r) => s + (Number(r.net) || 0), 0);
-    const totalDeductions = empRecs.reduce((s, r) => s + (Number(r.deductions) || 0), 0);
+    const totalDeductions = empRecs.filter(r => r.status !== "Failed").reduce((s, r) => s + (Number(r.deductions) || 0), 0);
     const sortedPaid      = [...paid].sort((a, b) => new Date(b.payment_date || b.month) - new Date(a.payment_date || a.month));
     return {
       id:            emp.id,

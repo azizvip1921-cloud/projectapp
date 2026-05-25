@@ -90,9 +90,24 @@ function PayrollManagementTab() {
   };
 
   const markPaid = async (id) => {
+    const rec = records.find(r => r.id === id);
+    if (!rec) return;
     try {
-      const rec = records.find(r => r.id === id);
-      const res = await fetch(`/api/payroll/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...rec, status: "Paid", payment_date: rec.payment_date || localToday() }) });
+      const payDate = rec.payment_date ? String(rec.payment_date).slice(0, 10) : localToday();
+      const res = await fetch(`/api/payroll/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          employee_name: rec.employee_name,
+          month:         rec.month || payDate.slice(0, 7),
+          payment_date:  payDate,
+          base_salary:   Number(rec.base_salary),
+          bonus:         Number(rec.bonus || 0),
+          deductions:    Number(rec.deductions || 0),
+          net:           Number(rec.net || 0),
+          status:        "Paid",
+        }),
+      });
       if (!res.ok) throw new Error();
       toast.success(t.pay_toast_paid); fetchRecords();
     } catch { toast.error(t.pay_toast_err_upd); }
@@ -158,7 +173,7 @@ function PayrollManagementTab() {
         {rec.bonus > 0 && <div style={{ fontSize: 10, color: "#10b981", marginBottom: 4 }}>+{Number(rec.bonus).toLocaleString()} bonus</div>}
         {rec.deductions > 0 && <div style={{ fontSize: 10, color: "#ef4444", marginBottom: 8 }}>-{Number(rec.deductions).toLocaleString()} deductions</div>}
         <div className="emp-card-actions" onClick={e => e.stopPropagation()}>
-          {rec.status === "Pending" && <button className="hr-btn-sm hr-btn-appr" onClick={() => markPaid(rec.id)}>{t.pay_btn_mark}</button>}
+          {(rec.status === "Pending" || rec.status === "Failed") && <button className="hr-btn-sm hr-btn-appr" onClick={() => markPaid(rec.id)}>{t.pay_btn_mark}</button>}
           <button className="hr-btn-sm hr-btn-edit" onClick={() => prepareEdit(rec)}>{t.btn_edit}</button>
           <DeleteConfirmDialog onConfirm={() => deleteRecord(rec.id)} itemName="record" />
         </div>
@@ -261,7 +276,7 @@ function PayrollManagementTab() {
             <TableCell><Badge text={rec.status} /></TableCell>
             <TableCell>
               <div className="pay-tbl-actions">
-                {rec.status === "Pending" && <button className="hr-btn-sm hr-btn-appr" onClick={() => markPaid(rec.id)}>{t.pay_btn_mark}</button>}
+                {(rec.status === "Pending" || rec.status === "Failed") && <button className="hr-btn-sm hr-btn-appr" onClick={() => markPaid(rec.id)}>{t.pay_btn_mark}</button>}
                 <button className="hr-btn-sm hr-btn-edit" onClick={() => prepareEdit(rec)}>{t.btn_edit}</button>
                 <DeleteConfirmDialog onConfirm={() => deleteRecord(rec.id)} itemName="record" />
               </div>

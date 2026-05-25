@@ -81,7 +81,7 @@ export default function EmployeeProfilePanel({
   const isOpen = !!employee;
   const emp = employee || {};
   const ac = AVATAR_COLORS[avatarIdx % AVATAR_COLORS.length];
-  const empId = emp.id ? `EMP-${String(emp.id).padStart(3, "0")}` : "—";
+  const empId = `EMP-${String(avatarIdx + 1).padStart(3, "0")}`;
 
   const [empAttendance, setEmpAttendance] = useState([]);
   const [empLeaves, setEmpLeaves] = useState([]);

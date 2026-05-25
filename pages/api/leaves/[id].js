@@ -6,9 +6,11 @@ export default async function handler(req, res) {
   if (req.method === "PUT") {
     try {
       const { employee_name, leave_type, start_date, end_date, days, status, notes } = req.body;
+      const cleanStart = start_date ? String(start_date).slice(0, 10) : null;
+      const cleanEnd = end_date ? String(end_date).slice(0, 10) : null;
       await data.query(
         "UPDATE leaves SET employee_name=?, leave_type=?, start_date=?, end_date=?, days=?, status=?, notes=? WHERE id=?",
-        [employee_name, leave_type, start_date, end_date, Number(days || 0), status, notes || null, id]
+        [employee_name, leave_type, cleanStart, cleanEnd, Number(days || 0), status, notes || null, id]
       );
       res.status(200).json({ success: true, message: "Leave request updated successfully" });
     } catch (error) {

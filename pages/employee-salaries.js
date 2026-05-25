@@ -5,26 +5,15 @@ import { Search, DollarSign, CheckCircle, Clock, FileText, Printer } from "lucid
 import { TableCell, TableRow } from "@/components/ui/table";
 import DataTable from "@/components/DataTable";
 
-const AVATAR_COLORS = [
-  { bg: "#EFF6FF", color: "#1D4ED8" },
-  { bg: "#DCFCE7", color: "#15803D" },
-  { bg: "#FEF9C3", color: "#92400E" },
-  { bg: "#F3E8FF", color: "#7C3AED" },
-  { bg: "#FEE2E2", color: "#DC2626" },
-  { bg: "#DBEAFE", color: "#1E40AF" },
-];
-
-const STATUS_CFG = {
-  Paid:    { bg: "#DCFCE7", color: "#15803D" },
-  Pending: { bg: "#FEF9C3", color: "#92400E" },
-  Failed:  { bg: "#FEE2E2", color: "#DC2626" },
-};
+const KNOWN_STATUSES = ["paid", "pending", "failed"];
 
 function StatusBadge({ text }) {
   const { tv } = useLanguage();
-  const c = STATUS_CFG[text] || { bg: "#F1F5F9", color: "#64748B" };
+  const cls = KNOWN_STATUSES.includes((text || "").toLowerCase())
+    ? `emp-badge--${text.toLowerCase()}`
+    : "emp-badge--default";
   return (
-    <span className="pay-status-badge" style={{ background: c.bg, color: c.color }}>
+    <span className={`emp-badge ${cls}`}>
       {tv(text) || "—"}
     </span>
   );
@@ -86,7 +75,7 @@ export default function EmployeeSalaries() {
       totalPending,
       totalDeductions,
       lastPaymentDate: sortedPaid[0] ? (sortedPaid[0].payment_date || sortedPaid[0].month) : null,
-      ac:         AVATAR_COLORS[idx % AVATAR_COLORS.length],
+      colorIdx:   idx % 6,
       allRecords: [...empRecs].sort((a, b) => new Date(b.payment_date || b.month) - new Date(a.payment_date || a.month)),
     };
   }
@@ -233,7 +222,7 @@ export default function EmployeeSalaries() {
         ) : filteredEmployee && (
           /* Per-employee summary cards — styled like employee stat cards */
           <>
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <div className="pay-back-print-row">
               <button
                 className="pay-btn-back"
                 onClick={() => { setEmpFilter("All"); setSearch(""); }}
@@ -249,13 +238,7 @@ export default function EmployeeSalaries() {
               </button>
             </div>
             <div className="pay-emp-header">
-              <div
-                className="pay-avatar-lg"
-                style={{
-                  background: filteredEmployee.image ? "transparent" : filteredEmployee.ac.bg,
-                  color: filteredEmployee.ac.color,
-                }}
-              >
+              <div className={`pay-avatar-lg ${filteredEmployee.image ? "av-img" : `av-c${filteredEmployee.colorIdx}`}`}>
                 {filteredEmployee.image
                   ? <img src={filteredEmployee.image} alt={filteredEmployee.employee_name} className="pay-avatar-img" />
                   : filteredEmployee.employee_name.charAt(0).toUpperCase()
@@ -307,13 +290,7 @@ export default function EmployeeSalaries() {
 
                   <TableCell className="min-w-[180px]">
                     <div className="pay-emp-cell">
-                      <div
-                        className="pay-avatar-sm"
-                        style={{
-                          background: emp.image ? "transparent" : emp.ac.bg,
-                          color: emp.ac.color,
-                        }}
-                      >
+                      <div className={`emp-avatar ${emp.image ? "av-img" : `av-c${emp.colorIdx}`}`}>
                         {emp.image
                           ? <img src={emp.image} alt={emp.employee_name} className="pay-avatar-img" />
                           : emp.employee_name.charAt(0).toUpperCase()
@@ -331,7 +308,7 @@ export default function EmployeeSalaries() {
                   </TableCell>
 
                   <TableCell>
-                    <span className="pay-tbl-paid">
+                    <span className="emp-salary-val">
                       {emp.totalPaid.toLocaleString()} IQD
                     </span>
                   </TableCell>
@@ -390,8 +367,8 @@ export default function EmployeeSalaries() {
                   {rec.deductions ? `-${Number(rec.deductions).toLocaleString()} IQD` : "—"}
                 </TableCell>
 
-                <TableCell className="pay-tbl-net">
-                  {Number(rec.net || 0).toLocaleString()} {rec.currency || "IQD"}
+                <TableCell>
+                  <span className="emp-salary-val">{Number(rec.net || 0).toLocaleString()} {rec.currency || "IQD"}</span>
                 </TableCell>
 
                 <TableCell>

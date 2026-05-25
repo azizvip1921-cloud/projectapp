@@ -65,7 +65,7 @@ export default function Documents() {
     const det = detectType(selectedFile.name);
     setType(det);
     setSize(formatSize(selectedFile.size));
-    if (!name) setName(selectedFile.name.replace(/\.[^/.]+$/, ""));
+    setName(selectedFile.name.replace(/\.[^/.]+$/, ""));
   };
 
   useEffect(() => { fetchDocs(); fetchEmployees(); }, []);
@@ -283,8 +283,8 @@ export default function Documents() {
                 <button
                   onClick={() => previewDoc(doc)}
                   className="docs-btn-preview"
-                  title="Preview PDF"
-                >↓ PDF</button>
+                  title={`Download ${doc.type}`}
+                >↓ {doc.type}</button>
                 <button className="hr-btn-sm hr-btn-edit" onClick={() => prepareEdit(doc)}>{t.btn_edit}</button>
                 <DeleteConfirmDialog onConfirm={() => deleteDoc(doc.id)} itemName="document" />
               </div>

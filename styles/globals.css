@@ -1168,6 +1168,10 @@ to {
   border-radius: 20px;
   font-weight: 600;
 }
+.emp-badge--paid    { background: #DCFCE7; color: #15803D; }
+.emp-badge--pending { background: #FEF9C3; color: #92400E; }
+.emp-badge--failed  { background: #FEE2E2; color: #DC2626; }
+.emp-badge--default { background: #F1F5F9; color: #64748B; }
 .emp-leave-row {
   flex-direction: column;
   align-items: flex-start;
@@ -1239,6 +1243,13 @@ to {
   font-weight: 700;
   flex-shrink: 0;
 }
+.av-c0 { background: #EFF6FF; color: #1D4ED8; }
+.av-c1 { background: #DCFCE7; color: #15803D; }
+.av-c2 { background: #FEF9C3; color: #92400E; }
+.av-c3 { background: #F3E8FF; color: #7C3AED; }
+.av-c4 { background: #FEE2E2; color: #DC2626; }
+.av-c5 { background: #DBEAFE; color: #1E40AF; }
+.av-img { background: transparent; }
 .emp-name-text {
   font-weight: 600;
   font-size: 12px;
@@ -2027,6 +2038,12 @@ to {
 .att-on-leave-banner svg {
   flex-shrink: 0;
   margin-top: 1px;
+}
+.att-on-leave-banner--error {
+  background: #FEE2E2;
+  border-color: #FECACA;
+  color: #DC2626;
+  margin-top: 8px;
 }
 
 .att-face-on-leave {
@@ -4584,6 +4601,11 @@ to {
 [dir="rtl"] .pay-btn-back-icon {
   transform: scaleX(-1);
 }
+
+.pay-back-print-row    { display: flex; gap: 8px; align-items: center; }
+.pay-card-avatar-center { margin: 4px auto 6px; }
+.pay-card-bonus        { font-size: 10px; color: #10B981; margin-bottom: 4px; }
+.pay-card-deductions   { font-size: 10px; color: #EF4444; margin-bottom: 8px; }
 
 /* ════════════════════════════════════════════════
    Requests Page (req- prefix)

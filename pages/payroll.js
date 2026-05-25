@@ -16,18 +16,14 @@ const localToday = () => { const d = new Date(); return `${d.getFullYear()}-${St
 const localMonth = () => localToday().slice(0, 7);
 const fmtDate = s => s ? new Date(String(s).slice(0,10)+"T00:00:00").toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "—";
 
-const STATUS_CFG = { Paid: { bg: "#DCFCE7", color: "#15803D" }, Pending: { bg: "#FEF9C3", color: "#92400E" }, Failed: { bg: "#FEE2E2", color: "#DC2626" } };
-
-const AVATAR_COLORS = [
-  { bg: "#EFF6FF", color: "#1D4ED8" }, { bg: "#DCFCE7", color: "#15803D" },
-  { bg: "#FEF9C3", color: "#92400E" }, { bg: "#F3E8FF", color: "#7C3AED" },
-  { bg: "#FEE2E2", color: "#DC2626" }, { bg: "#DBEAFE", color: "#1E40AF" },
-];
+const KNOWN_STATUSES = ["paid", "pending", "failed"];
 
 function Badge({ text }) {
   const { tv } = useLanguage();
-  const c = STATUS_CFG[text] || { bg: "#F1F5F9", color: "#64748B" };
-  return <span className="hr-badge" style={{ background: c.bg, color: c.color }}>{tv(text) || "—"}</span>;
+  const cls = KNOWN_STATUSES.includes((text || "").toLowerCase())
+    ? `emp-badge--${text.toLowerCase()}`
+    : "emp-badge--default";
+  return <span className={`emp-badge ${cls}`}>{tv(text) || "—"}</span>;
 }
 
 function PayrollManagementTab() {
@@ -140,7 +136,7 @@ function PayrollManagementTab() {
     return {
       dept: emp?.department || "—",
       image: emp?.image || "",
-      ac: AVATAR_COLORS[idx >= 0 ? idx % AVATAR_COLORS.length : 0],
+      colorIdx: idx >= 0 ? idx % 6 : 0,
     };
   };
 
@@ -160,7 +156,7 @@ function PayrollManagementTab() {
     const payDate = fmtDate(rec.payment_date);
     return (
       <div key={rec.id} className="emp-card">
-        <div className="pay-avatar-sm" style={{ background: empData.image ? "transparent" : empData.ac.bg, color: empData.ac.color, margin: "4px auto 6px" }}>
+        <div className={`emp-avatar pay-card-avatar-center ${empData.image ? "av-img" : `av-c${empData.colorIdx}`}`}>
           {empData.image ? <img src={empData.image} alt={rec.employee_name} className="pay-avatar-img" /> : rec.employee_name.charAt(0).toUpperCase()}
         </div>
         <div className="emp-card-name">{rec.employee_name}</div>
@@ -170,8 +166,8 @@ function PayrollManagementTab() {
           <Badge text={rec.status} />
         </div>
         <div className="emp-card-salary">{Number(rec.net || 0).toLocaleString()} {rec.currency || "IQD"}</div>
-        {rec.bonus > 0 && <div style={{ fontSize: 10, color: "#10b981", marginBottom: 4 }}>+{Number(rec.bonus).toLocaleString()} bonus</div>}
-        {rec.deductions > 0 && <div style={{ fontSize: 10, color: "#ef4444", marginBottom: 8 }}>-{Number(rec.deductions).toLocaleString()} deductions</div>}
+        {rec.bonus > 0 && <div className="pay-card-bonus">+{Number(rec.bonus).toLocaleString()} bonus</div>}
+        {rec.deductions > 0 && <div className="pay-card-deductions">-{Number(rec.deductions).toLocaleString()} deductions</div>}
         <div className="emp-card-actions" onClick={e => e.stopPropagation()}>
           {(rec.status === "Pending" || rec.status === "Failed") && <button className="hr-btn-sm hr-btn-appr" onClick={() => markPaid(rec.id)}>{t.pay_btn_mark}</button>}
           <button className="hr-btn-sm hr-btn-edit" onClick={() => prepareEdit(rec)}>{t.btn_edit}</button>
@@ -255,7 +251,7 @@ function PayrollManagementTab() {
               >
                 {(() => { const emp = getEmpData(rec.employee_name); return (
                   <>
-                    <div className="pay-avatar-sm" style={{ background: emp.image ? "transparent" : emp.ac.bg, color: emp.ac.color }}>
+                    <div className={`emp-avatar ${emp.image ? "av-img" : `av-c${emp.colorIdx}`}`}>
                       {emp.image ? <img src={emp.image} alt={rec.employee_name} className="pay-avatar-img" /> : rec.employee_name.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -269,10 +265,10 @@ function PayrollManagementTab() {
             <TableCell className="pay-tbl-date">
               {fmtDate(rec.payment_date)}
             </TableCell>
-            <TableCell className="pay-tbl-base">{Number(rec.base_salary || 0).toLocaleString()}</TableCell>
-            <TableCell><span className="pay-tbl-bonus">{rec.bonus ? `+${Number(rec.bonus).toLocaleString()}` : "—"}</span></TableCell>
-            <TableCell><span className="pay-tbl-deductions">{rec.deductions ? `-${Number(rec.deductions).toLocaleString()}` : "—"}</span></TableCell>
-            <TableCell><span className="pay-tbl-net">{Number(rec.net || 0).toLocaleString()} {rec.currency || "IQD"}</span></TableCell>
+            <TableCell className="pay-tbl-base">{Number(rec.base_salary || 0).toLocaleString()} {rec.currency || "IQD"}</TableCell>
+            <TableCell><span className="pay-tbl-bonus">{rec.bonus ? `+${Number(rec.bonus).toLocaleString()} ${rec.currency || "IQD"}` : "—"}</span></TableCell>
+            <TableCell><span className="pay-tbl-deductions">{rec.deductions ? `-${Number(rec.deductions).toLocaleString()} ${rec.currency || "IQD"}` : "—"}</span></TableCell>
+            <TableCell><span className="emp-salary-val">{Number(rec.net || 0).toLocaleString()} {rec.currency || "IQD"}</span></TableCell>
             <TableCell><Badge text={rec.status} /></TableCell>
             <TableCell>
               <div className="pay-tbl-actions">
@@ -316,7 +312,7 @@ function PayrollManagementTab() {
                   <SelectContent>{employees.map(e => <SelectItem key={e.id} value={e.employee_name}>{e.employee_name}</SelectItem>)}</SelectContent>
                 </Select>
                 {contractInactive && (
-                  <div className="att-on-leave-banner" style={{ background: "#FEE2E2", borderColor: "#FECACA", color: "#DC2626", marginTop: 8 }}>
+                  <div className="att-on-leave-banner att-on-leave-banner--error">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                     <span>{t.pay_contract_inactive(employee_name)}</span>
                   </div>

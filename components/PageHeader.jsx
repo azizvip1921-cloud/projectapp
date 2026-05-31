@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
-import { Sun, Moon, Globe, User, LogOut, ChevronDown, KeyRound, Bell, Calendar, FileText, DollarSign, Search, Users, ClipboardList, Briefcase, CreditCard, TrendingUp, ShieldCheck, Clock, FileCheck, Settings, Wallet, Building2, Palette, Database, Wifi, CalendarDays, File, LayoutDashboard, Inbox, Receipt, CalendarOff, Eye, EyeOff } from "lucide-react";
+import { Sun, Moon, Globe, User, LogOut, ChevronDown, KeyRound, Bell, Calendar, FileText, DollarSign, Search, Users, ClipboardList, Briefcase, CreditCard, TrendingUp, ShieldCheck, Clock, FileCheck, Settings, Wallet, Building2, Palette, Database, Wifi, CalendarDays, File, LayoutDashboard, Inbox, Receipt, CalendarOff, Eye, EyeOff, Archive } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useFormVisibility } from "@/components/FormVisibilityContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -642,7 +642,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
                       className="ph-notif-dismiss"
                       onClick={(e) => dismissNotif(e, n.id)}
                       title={t.notif_dismiss || "Dismiss"}
-                    >✕</button>
+                    ><Archive size={14} /></button>
                   </div>
                 );
               })

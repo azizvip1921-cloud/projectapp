@@ -86,8 +86,9 @@ export default function AttendanceRecords() {
 
   const filtered = records.filter(r => {
     if (!r.date) return false;
-    const d = new Date(r.date);
-    return d.getMonth() === selMonth && d.getFullYear() === selYear;
+    const datePart = r.date.split("T")[0];
+    const [y, m] = datePart.split("-").map(Number);
+    return (m - 1) === selMonth && y === selYear;
   });
 
   const summary = employees.map((emp, idx) => {
@@ -285,7 +286,11 @@ export default function AttendanceRecords() {
                       {empRecords.map((r, i) => (
                         <tr key={i} className="rec-detail-tr">
                           <td className="rec-detail-td rec-detail-td--nowrap">
-                            {new Date(r.date).toLocaleDateString()}
+                            {(() => {
+                              if (!r.date) return "—";
+                              const [y, m, d] = r.date.split("T")[0].split("-");
+                              return `${d}/${m}/${y}`;
+                            })()}
                           </td>
                           <td className="rec-detail-td">{r.check_in || "—"}</td>
                           <td className="rec-detail-td">{r.check_out || "—"}</td>

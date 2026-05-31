@@ -50,9 +50,25 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
 
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [dismissedNotifIds, setDismissedNotifIds] = useState(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("hr_dismissed_notifs") || "[]")); }
+    catch { return new Set(); }
+  });
   const notifRef = useRef(null);
   const notifBtnRef = useRef(null);
   const seenNotifIds = useRef(null);
+
+  const visibleNotifs = notifications.filter(n => !dismissedNotifIds.has(n.id));
+
+  const dismissNotif = (e, id) => {
+    e.stopPropagation();
+    setDismissedNotifIds(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      try { localStorage.setItem("hr_dismissed_notifs", JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  };
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -142,7 +158,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
           );
         if (Array.isArray(requests))
           requests.filter(r => r.status === "Pending").forEach(r =>
-            notifs.push({ id: `req-${r.id}`, type: "request", title: r.employee_name, sub: r.request_type || r.subject, href: "/requests" })
+            notifs.push({ id: `req-${r.id}`, type: "request", title: r.employee_name, sub: [r.request_type, r.subject].filter(Boolean).join(" · "), href: "/requests" })
           );
         if (Array.isArray(payroll))
           payroll.filter(p => p.status === "Pending").forEach(p =>
@@ -390,9 +406,9 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
               title={t.notif_title || "Notifications"}
             >
               <Bell size={16} />
-              {notifications.length > 0 && (
+              {visibleNotifs.length > 0 && (
                 <span className="ph-notif-badge">
-                  {notifications.length > 99 ? "99+" : notifications.length}
+                  {visibleNotifs.length > 99 ? "99+" : visibleNotifs.length}
                 </span>
               )}
             </button>
@@ -606,29 +622,34 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
         <div className="ph-notif-dropdown" ref={notifRef}>
           <div className="ph-notif-header">
             <span>{t.notif_title || "Notifications"}</span>
-            {notifications.length > 0 && <span className="ph-notif-count">{notifications.length}</span>}
+            {visibleNotifs.length > 0 && <span className="ph-notif-count">{visibleNotifs.length}</span>}
           </div>
           <div className="ph-notif-list">
-            {notifications.length === 0 ? (
+            {visibleNotifs.length === 0 ? (
               <div className="ph-notif-empty">{t.notif_empty || "No new notifications"}</div>
             ) : (
-              notifications.slice(0, 10).map(n => {
+              visibleNotifs.slice(0, 10).map(n => {
                 const Icon = n.type === "leave" ? Calendar : n.type === "request" ? FileText : DollarSign;
                 return (
                   <div key={n.id} className="ph-notif-item" onClick={() => { setNotifOpen(false); router.push(n.href); }}>
                     <div className={`ph-notif-icon ph-notif-icon--${n.type}`}><Icon size={14} /></div>
                     <div className="ph-notif-body">
                       <div className="ph-notif-name">{n.title}</div>
-                      <div className="ph-notif-sub">{n.sub}</div>
+                      {n.sub && <div className="ph-notif-sub">{n.sub}</div>}
                     </div>
                     <span className="ph-notif-pending">{t.lbl_pending || "Pending"}</span>
+                    <button
+                      className="ph-notif-dismiss"
+                      onClick={(e) => dismissNotif(e, n.id)}
+                      title={t.notif_dismiss || "Dismiss"}
+                    >✕</button>
                   </div>
                 );
               })
             )}
           </div>
-          {notifications.length > 10 && (
-            <div className="ph-notif-footer">+{notifications.length - 10} {t.notif_more || "more"}</div>
+          {visibleNotifs.length > 10 && (
+            <div className="ph-notif-footer">+{visibleNotifs.length - 10} {t.notif_more || "more"}</div>
           )}
         </div>,
         document.body

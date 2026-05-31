@@ -119,8 +119,24 @@ export default function Contracts() {
     catch { toast.error(t.cont_toast_err_del); }
   };
 
-  const stats = { total: records.length, active: records.filter(r => r.status === "Active").length, inactive: records.filter(r => r.status === "Inactive").length, onLeave: records.filter(r => r.status === "On Leave").length, suspended: records.filter(r => r.status === "Suspended").length, permanent: records.filter(r => r.contract_type === "Permanent").length, temporary: records.filter(r => r.contract_type === "Temporary").length };
-  const filtered = filter === "All" ? records : records.filter(r => r.status === filter);
+  const getContractStatus = (rec) => {
+    const emp = employees.find(e => e.employee_name === rec.employee_name);
+    if (emp?.status === "On Leave" && rec.status === "Active") {
+      return "On Leave";
+    }
+    return rec.status;
+  };
+
+  const stats = {
+    total: records.length,
+    active: records.filter(r => getContractStatus(r) === "Active").length,
+    inactive: records.filter(r => getContractStatus(r) === "Inactive").length,
+    onLeave: records.filter(r => getContractStatus(r) === "On Leave").length,
+    suspended: records.filter(r => getContractStatus(r) === "Suspended").length,
+    permanent: records.filter(r => r.contract_type === "Permanent").length,
+    temporary: records.filter(r => r.contract_type === "Temporary").length,
+  };
+  const filtered = filter === "All" ? records : records.filter(r => getContractStatus(r) === filter);
 
   const printContract = (rec) => {
     const isRTL = lang === "ku" || lang === "ar";
@@ -282,7 +298,7 @@ body{font-family:${fontFamily};direction:${dir};background:#fff;color:#1a1a2e;pa
               <TableCell style={{ fontSize: 12 }}>{rec.start_date ? new Date(rec.start_date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"}</TableCell>
               <TableCell style={{ fontSize: 12, color: "#94A3B8" }}>{rec.end_date ? new Date(rec.end_date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : t.cont_indefinite}</TableCell>
               <TableCell><span className="cont-salary-val">{rec.salary ? `${Number(rec.salary).toLocaleString()} IQD` : "—"}</span></TableCell>
-              <TableCell><Badge text={rec.status} cfg={STATUS_CFG} /></TableCell>
+              <TableCell><Badge text={getContractStatus(rec)} cfg={STATUS_CFG} /></TableCell>
               <TableCell onClick={e => e.stopPropagation()}>
                 <div className="cont-action-btns">
                   <button className="hr-btn-sm hr-btn-edit" onClick={() => prepareEdit(rec)}>{t.btn_edit}</button>

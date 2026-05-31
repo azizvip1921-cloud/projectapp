@@ -5817,6 +5817,27 @@ to {
   text-overflow:ellipsis;
   margin-top:1px;
 }
+.ph-notif-dismiss {
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  background:var(--hr-card2);
+  border:1px solid var(--hr-border);
+  color:var(--hr-text);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-family:inherit;
+  flex-shrink:0;
+  transition:background 0.15s, color 0.15s;
+}
+.ph-notif-dismiss:hover {
+  background:#FEE2E2;
+  color:#DC2626;
+  border-color:#FCA5A5;
+}
 .ph-notif-pending {
   font-size:10px;
   font-weight:600;

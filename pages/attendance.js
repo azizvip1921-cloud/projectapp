@@ -327,7 +327,7 @@ function FaceScanner({ mode, employees, onClose, fetchRecords }) {
       const data = await res.json();
       if (!data.employee_name) {
         const name = data.deleted_name || null;
-        const msg = name ? `${t.att_no_employee_found}: ${name}` : t.att_no_employee_found;
+        const msg = data.message || (name ? `${t.att_no_employee_found}: ${name}` : t.att_no_employee_found);
         showError(msg);
         return;
       }

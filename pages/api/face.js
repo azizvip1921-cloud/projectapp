@@ -110,13 +110,26 @@ export default async function handler(req, res) {
         // Verify the matched employee still exists in the employee table
         // (handles cases where employee was deleted but face descriptor wasn't cleaned up)
         const [empCheck] = await data.query(
-          "SELECT id FROM employee WHERE employee_name = ? LIMIT 1",
+          "SELECT id, status FROM employee WHERE employee_name = ? LIMIT 1",
           [bestName]
         );
         if (empCheck.length === 0) {
           // Employee no longer exists — clean up the orphaned descriptor automatically
           await data.query("DELETE FROM face_descriptors WHERE employee_name = ?", [bestName]);
           return res.status(200).json({ employee_name: null, deleted: true, deleted_name: bestName, total_days: 0, today_record: null });
+        }
+
+        const employeeStatus = empCheck[0].status;
+        if (employeeStatus === "Inactive" || employeeStatus === "Suspended") {
+          return res.status(200).json({ employee_name: null, message: `Employee ${bestName} is inactive`, total_days: 0, today_record: null });
+        }
+
+        const [activeContracts] = await data.query(
+          "SELECT id FROM contracts WHERE employee_name = ? AND (end_date IS NULL OR DATE(end_date) >= CURDATE()) AND status NOT IN ('Inactive', 'Expired') LIMIT 1",
+          [bestName]
+        );
+        if (activeContracts.length === 0) {
+          return res.status(200).json({ employee_name: null, message: `Contract completed for ${bestName}`, deleted_name: bestName, total_days: 0, today_record: null });
         }
 
         // Total attendance days for this employee

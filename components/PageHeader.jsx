@@ -74,6 +74,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
   const [searchQuery, setSearchQuery] = useState("");
   const [allEmployees, setAllEmployees] = useState([]);
   const [allDocuments, setAllDocuments] = useState([]);
+  const [selectedSearchEmployee, setSelectedSearchEmployee] = useState(null);
   const searchRef = useRef(null);
   const searchBtnRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -332,6 +333,25 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
         />
       )}
 
+      {selectedSearchEmployee && (
+        <EmployeeProfilePanel
+          employee={selectedSearchEmployee}
+          onClose={() => setSelectedSearchEmployee(null)}
+          onEdit={(emp) => { setSelectedSearchEmployee(null); router.push(`/employee?edit=${emp.id}`); }}
+          onDeactivate={async (emp) => {
+            try {
+              const res = await fetch(`/api/employee/${emp.id}`, {
+                method: "PUT",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ ...emp, status: "Inactive" }),
+              });
+              if (res.ok) setSelectedSearchEmployee(prev => prev ? { ...prev, status: "Inactive" } : null);
+            } catch {}
+          }}
+        />
+      )}
+
+
       <Dialog open={showChangePw} onOpenChange={(open) => { setShowChangePw(open); if (!open) setPwError(""); }}>
         <DialogContent className="sm:max-w-sm" dir={t.dir || "ltr"}>
           <DialogHeader>
@@ -573,7 +593,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
                     <div className="ph-search-section-label">{t.nav_employees || "Employees"}</div>
                     {filteredEmployees.map(emp => (
                       <div key={emp.id} className="ph-search-item"
-                        onClick={() => { setSearchOpen(false); setSearchQuery(""); router.push(`/employee?edit=${emp.id}`); }}>
+                        onClick={() => { setSearchOpen(false); setSearchQuery(""); setSelectedSearchEmployee(emp); }}>
                         <div className="ph-search-emp-avatar">
                           {emp.image ? <img src={emp.image} alt="" /> : emp.employee_name?.charAt(0).toUpperCase()}
                         </div>

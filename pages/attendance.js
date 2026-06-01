@@ -141,11 +141,31 @@ function StatusBadge({ status }) {
 }
 
 
-function WeekPicker({ filterDate, setFilterDate }) {
+const WEEK_DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function dayNameOf(ds) {
+  return WEEK_DAY_NAMES[new Date(ds + "T00:00:00").getDay()];
+}
+
+function WeekPicker({ filterDate, setFilterDate, workingDays, workingDayHistory }) {
   const { lang } = useLanguage();
   const i18n = WEEK_I18N[lang] || WEEK_I18N.en;
   const today = localToday();
   const selectedBtnRef = useRef(null);
+
+  const isOff = (ds) => {
+    const name = dayNameOf(ds);
+    if (ds >= today) {
+      const found = workingDays.find(w => w.day_name === name);
+      return found ? !found.is_working : false;
+    }
+    // ڕۆژانی تێپەڕ — مێژوو check دەکرێت
+    const record = workingDayHistory.find(h =>
+      h.day_name === name &&
+      h.start_date.slice(0, 10) <= ds &&
+      (!h.end_date || h.end_date.slice(0, 10) > ds)
+    );
+    return record ? !record.is_working : false;
+  };
 
   const offsetDate = (base, n) => {
     const d = new Date(base + "T00:00:00");
@@ -195,10 +215,11 @@ function WeekPicker({ filterDate, setFilterDate }) {
       <div className="att-week-days">
         {days.map((ds) => {
           const sel = filterDate === ds;
+          const off = isOff(ds) && ds >= today;
           return (
-            <button key={ds} ref={sel ? selectedBtnRef : null} onClick={() => setFilterDate(ds)} title={ds} className="att-week-day-btn"
-              style={{ background: sel ? "#1D4ED8" : "transparent", color: sel ? "#fff" : "var(--hr-text)", fontWeight: sel ? 700 : 500 }}>
-              {getDayLabel(ds)}
+            <button key={ds} ref={sel ? selectedBtnRef : null} onClick={() => setFilterDate(ds)} title={ds}
+              className={`att-week-day-btn${off && sel ? " att-week-day-btn--off-sel" : off ? " att-week-day-btn--off" : sel ? " att-week-day-btn--sel" : ""}`}>
+              {getDayLabel(ds)}{off ? " OFF" : ""}
             </button>
           );
         })}
@@ -549,8 +570,23 @@ function AttendanceManagementTab() {
   const [faceMode, setFaceMode]         = useState(null);
   const [activeLeave, setActiveLeave]   = useState(null);
   const [contractInactive, setContractInactive] = useState(false);
+  const [workingDays, setWorkingDays]         = useState([]);
+  const [workingDayHistory, setWorkingDayHistory] = useState([]);
 
-  useEffect(() => { fetchRecords(); fetchEmployees(); }, []);
+  useEffect(() => { fetchRecords(); fetchEmployees(); fetchWorkingDays(); }, []);
+
+  const fetchWorkingDays = async () => {
+    try {
+      const [daysRes, histRes] = await Promise.all([
+        fetch("/api/working-days"),
+        fetch("/api/working-days?history=1"),
+      ]);
+      const days = await daysRes.json();
+      const hist = await histRes.json();
+      setWorkingDays(Array.isArray(days) ? days : []);
+      setWorkingDayHistory(Array.isArray(hist) ? hist : []);
+    } catch (e) { console.error("Failed to fetch working days:", e); }
+  };
 
   const fetchRecords = async () => {
     try {
@@ -704,8 +740,34 @@ function AttendanceManagementTab() {
       </div>
 
       <div className="att-week-wrap">
-        <WeekPicker filterDate={filterDate} setFilterDate={setFilterDate} />
+        <WeekPicker filterDate={filterDate} setFilterDate={setFilterDate} workingDays={workingDays} workingDayHistory={workingDayHistory} />
       </div>
+
+      {(() => {
+        const name = dayNameOf(filterDate);
+        const found = workingDays.find(w => w.day_name === name);
+        const isDayOff = (() => {
+          if (filterDate >= localToday()) {
+            return found ? !found.is_working : false;
+          }
+          const rec = workingDayHistory.find(h =>
+            h.day_name === name &&
+            h.start_date.slice(0, 10) <= filterDate &&
+            (!h.end_date || h.end_date.slice(0, 10) > filterDate)
+          );
+          return rec ? !rec.is_working : false;
+        })();
+        if (!isDayOff) return null;
+        return (
+          <div className="att-dayoff-banner">
+            <span className="att-dayoff-banner__icon">📅</span>
+            <div>
+              <div className="att-dayoff-banner__title">{name} — {t.wd_off || "Day Off"}</div>
+              <div className="att-dayoff-banner__sub">{t.att_face_day_off_blocked || "This day is set as a day off"}</div>
+            </div>
+          </div>
+        );
+      })()}
 
       <div className="flex flex-1 flex-col gap-4 p-4 shiny-ring">
         <div className="att-stats-grid">

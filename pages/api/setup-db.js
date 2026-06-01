@@ -219,10 +219,20 @@ export default async function handler(req, res) {
       )
     `);
 
+    await data.query(`
+      CREATE TABLE IF NOT EXISTS \`working_day_history\` (
+        \`id\`         INT AUTO_INCREMENT PRIMARY KEY,
+        \`day_name\`   VARCHAR(20) NOT NULL,
+        \`is_working\` TINYINT(1)  NOT NULL,
+        \`start_date\` DATE        NOT NULL,
+        \`end_date\`   DATE        NULL
+      )
+    `);
+
     res.status(200).json({
       success: true,
       message: "All tables created successfully",
-      tables: ["employee", "contracts", "expenses", "attendance", "payroll", "leaves", "safe", "requests", "revenue", "documents", "face_descriptors", "working_days", "holidays", "users", "sessions"],
+      tables: ["employee", "contracts", "expenses", "attendance", "payroll", "leaves", "safe", "requests", "revenue", "documents", "face_descriptors", "working_days", "working_day_history", "holidays", "users", "sessions"],
     });
   } catch (error) {
     console.error("Database setup error:", error);

@@ -3,6 +3,10 @@ import data from "@/lib/data";
 export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
+      if (req.query.history === "1") {
+        const [rows] = await data.query("SELECT * FROM working_day_history ORDER BY start_date DESC");
+        return res.status(200).json(rows);
+      }
       const [rows] = await data.query("SELECT * FROM working_days");
       res.status(200).json(rows);
     } catch (error) {
@@ -11,10 +15,26 @@ export default async function handler(req, res) {
   } else if (req.method === "PUT") {
     try {
       const { day_name, is_working } = req.body;
+      const isWorkingVal = is_working ? 1 : 0;
+
+      // تۆماری کونەی کراوە داخستن
+      await data.query(
+        "UPDATE working_day_history SET end_date = CURDATE() WHERE day_name = ? AND end_date IS NULL",
+        [day_name]
+      );
+
+      // تۆماری نوێ زیادکردن
+      await data.query(
+        "INSERT INTO working_day_history (day_name, is_working, start_date, end_date) VALUES (?, ?, CURDATE(), NULL)",
+        [day_name, isWorkingVal]
+      );
+
+      // working_days جەدوەل نوێکردنەوە
       await data.query(
         "UPDATE working_days SET is_working = ? WHERE day_name = ?",
-        [is_working ? 1 : 0, day_name]
+        [isWorkingVal, day_name]
       );
+
       res.status(200).json({ success: true });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });

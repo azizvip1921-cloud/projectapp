@@ -1559,6 +1559,44 @@ to {
   white-space: nowrap;
   flex-shrink: 0;
 }
+.att-dayoff-banner {
+  margin: 0 16px 8px;
+  padding: 12px 16px;
+  background: #FEE2E2;
+  border: 1px solid #FECACA;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.att-dayoff-banner__icon {
+  font-size: 18px;
+}
+.att-dayoff-banner__title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #DC2626;
+}
+.att-dayoff-banner__sub {
+  font-size: 12px;
+  color: #B91C1C;
+}
+.att-week-day-btn--sel {
+  background: #1D4ED8;
+  color: #fff;
+  font-weight: 700;
+}
+.att-week-day-btn--off {
+  color: #DC2626;
+  opacity: 0.7;
+  font-weight: 500;
+}
+.att-week-day-btn--off-sel {
+  background: #DC2626;
+  color: #fff;
+  font-weight: 700;
+  opacity: 1;
+}
 
 .att-face-camera-wrap {
   display: flex;

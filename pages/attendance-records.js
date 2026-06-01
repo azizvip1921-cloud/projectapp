@@ -65,11 +65,36 @@ function RateBar({ rate }) {
 }
 
 
+const DAY_NAMES_EN = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+function getWorkingDaysInMonth(year, month, workingDays, workingDayHistory) {
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  let count = 0;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dayName = DAY_NAMES_EN[new Date(year, month, d).getDay()];
+    const ds = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const hist = (workingDayHistory || []).find(h =>
+      h.day_name === dayName &&
+      h.start_date.slice(0, 10) <= ds &&
+      (!h.end_date || h.end_date.slice(0, 10) > ds)
+    );
+    if (hist) {
+      if (hist.is_working) count++;
+    } else {
+      const found = workingDays.find(w => w.day_name === dayName);
+      if (found && found.is_working) count++;
+    }
+  }
+  return count;
+}
+
 export default function AttendanceRecords() {
   const { t, lang } = useLanguage();
   const now = new Date();
   const [records, setRecords]         = useState([]);
   const [employees, setEmployees]     = useState([]);
+  const [workingDays, setWorkingDays]             = useState([]);
+  const [workingDayHistory, setWorkingDayHistory] = useState([]);
   const [selMonth, setSelMonth]       = useState(now.getMonth());
   const [selYear, setSelYear]         = useState(now.getFullYear());
   const [selectedEmp, setSelectedEmp] = useState(null);
@@ -77,6 +102,8 @@ export default function AttendanceRecords() {
   useEffect(() => {
     fetch("/api/attendance").then(r => r.json()).then(d => setRecords(Array.isArray(d) ? d : []));
     fetch("/api/employee").then(r => r.json()).then(d => setEmployees(Array.isArray(d) ? d : d.employees || []));
+    fetch("/api/working-days").then(r => r.json()).then(d => setWorkingDays(Array.isArray(d) ? d : []));
+    fetch("/api/working-days?history=1").then(r => r.json()).then(d => setWorkingDayHistory(Array.isArray(d) ? d : []));
   }, []);
 
   const monthNames = lang === "ku" ? MONTH_NAMES_KU : lang === "ar" ? MONTH_NAMES_AR : MONTH_NAMES_EN;
@@ -91,13 +118,15 @@ export default function AttendanceRecords() {
     return (m - 1) === selMonth && y === selYear;
   });
 
+  const workingDaysInMonth = getWorkingDaysInMonth(selYear, selMonth, workingDays, workingDayHistory);
+
   const summary = employees.map((emp, idx) => {
     const recs     = filtered.filter(r => r.employee_name === emp.employee_name);
     const present  = recs.filter(r => r.status === "Present" || r.status === "Early").length;
     const late     = recs.filter(r => r.status === "Late").length;
     const absent   = recs.filter(r => r.status === "Absent").length;
     const onLeave  = recs.filter(r => r.status === "On Leave").length;
-    const total    = present + late + absent;
+    const total    = workingDaysInMonth;
     const attended = present + late;
     const rate     = total > 0 ? Math.round((attended / total) * 100) : 0;
     return {

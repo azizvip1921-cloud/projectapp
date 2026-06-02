@@ -215,7 +215,8 @@ function WeekPicker({ filterDate, setFilterDate, workingDays, workingDayHistory 
       <div className="att-week-days">
         {days.map((ds) => {
           const sel = filterDate === ds;
-          const off = isOff(ds) && ds >= today;
+          const off = isOff(ds);
+          const isPast = ds < today;
           return (
             <button key={ds} ref={sel ? selectedBtnRef : null} onClick={() => setFilterDate(ds)} title={ds}
               className={`att-week-day-btn${off && sel ? " att-week-day-btn--off-sel" : off ? " att-week-day-btn--off" : sel ? " att-week-day-btn--sel" : ""}`}>
@@ -764,7 +765,7 @@ function AttendanceManagementTab() {
             <div>
               <div className="att-dayoff-banner__title">{name} — {t.wd_off || "Day Off"}</div>
               <div className="att-dayoff-banner__sub">{t.att_face_day_off_blocked || "This day is set as a day off"}</div>
-            </div>
+             </div>
           </div>
         );
       })()}

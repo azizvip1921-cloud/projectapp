@@ -67,10 +67,10 @@ function RateBar({ rate }) {
 
 const DAY_NAMES_EN = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
-function getWorkingDaysInMonth(year, month, workingDays, workingDayHistory) {
+function getWorkingDaysInMonth(year, month, workingDays, workingDayHistory, startDay = 1) {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   let count = 0;
-  for (let d = 1; d <= daysInMonth; d++) {
+  for (let d = startDay; d <= daysInMonth; d++) {
     const dayName = DAY_NAMES_EN[new Date(year, month, d).getDay()];
     const ds = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const hist = (workingDayHistory || []).find(h =>
@@ -118,15 +118,27 @@ export default function AttendanceRecords() {
     return (m - 1) === selMonth && y === selYear;
   });
 
-  const workingDaysInMonth = getWorkingDaysInMonth(selYear, selMonth, workingDays, workingDayHistory);
-
   const summary = employees.map((emp, idx) => {
     const recs     = filtered.filter(r => r.employee_name === emp.employee_name);
     const present  = recs.filter(r => r.status === "Present" || r.status === "Early").length;
     const late     = recs.filter(r => r.status === "Late").length;
     const absent   = recs.filter(r => r.status === "Absent").length;
     const onLeave  = recs.filter(r => r.status === "On Leave").length;
-    const total    = workingDaysInMonth;
+
+    let startDay = 1;
+    if (emp.hire_date) {
+      const hire = new Date(emp.hire_date);
+      const hireYear = hire.getFullYear();
+      const hireMonth = hire.getMonth();
+      if (hireYear === selYear && hireMonth === selMonth) {
+        startDay = hire.getDate();
+      } else if (hireYear > selYear || (hireYear === selYear && hireMonth > selMonth)) {
+        startDay = null;
+      }
+    }
+    const total = startDay !== null
+      ? getWorkingDaysInMonth(selYear, selMonth, workingDays, workingDayHistory, startDay)
+      : 0;
     const attended = present + late;
     const rate     = total > 0 ? Math.round((attended / total) * 100) : 0;
     return {

@@ -126,7 +126,7 @@ export default function SettingsPage() {
     const saved = localStorage.getItem("company_info");
     if (saved) setCompany(JSON.parse(saved));
 
-    const sessionPw = sessionStorage.getItem("hr_session_pw") || "";
+    const sessionPw = localStorage.getItem("hr_session_pw") || "";
     if (sessionPw) setPw(p => ({ ...p, current: sessionPw }));
 
     window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); setDeferredPrompt(e); });
@@ -157,7 +157,7 @@ export default function SettingsPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
-      sessionStorage.setItem("hr_session_pw", pw.next);
+      localStorage.setItem("hr_session_pw", pw.next);
       toast.success(t.set_pw_changed);
       setPw({ current: pw.next, next: "", confirm: "" });
     } catch (e) { toast.error(e.message); }

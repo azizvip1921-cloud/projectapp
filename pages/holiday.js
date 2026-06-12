@@ -165,7 +165,7 @@ export default function HolidayPage() {
   const [selectedHoliday, setSelectedHoliday] = useState(null);
 
   useEffect(() => {
-    fetch("/api/holidays")
+    fetch("/api/holidays", { cache: "no-store" })
       .then(r => r.json())
       .then(d => { setHolidays(Array.isArray(d) ? d : []); setLoading(false); })
       .catch(() => setLoading(false));

@@ -5,9 +5,11 @@ export default async function handler(req, res) {
     try {
       if (req.query.history === "1") {
         const [rows] = await data.query("SELECT * FROM working_day_history ORDER BY start_date DESC");
+        res.setHeader("Cache-Control", "no-store");
         return res.status(200).json(rows);
       }
       const [rows] = await data.query("SELECT * FROM working_days");
+      res.setHeader("Cache-Control", "no-store");
       res.status(200).json(rows);
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });

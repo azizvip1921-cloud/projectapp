@@ -272,7 +272,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     localStorage.removeItem("hr_auth");
     localStorage.removeItem("hr_user");
-    sessionStorage.removeItem("hr_session_pw");
+    localStorage.removeItem("hr_session_pw");
     window.location.replace("/login");
   };
 
@@ -296,7 +296,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
       });
       const data = await res.json();
       if (!res.ok) { setPwError(data.error === "wrong_password" ? (t.prof_change_password_wrong || "Current password is incorrect") : (data.error || "Error")); return; }
-      sessionStorage.setItem("hr_session_pw", pwForm.next);
+      localStorage.setItem("hr_session_pw", pwForm.next);
       setShowChangePw(false);
     } catch { setPwError("Server error"); }
     finally { setPwLoading(false); }
@@ -512,7 +512,7 @@ export default function PageHeader({ title, children, hideControls, alwaysShow }
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer gap-2"
-                onClick={() => { const sessionPw = sessionStorage.getItem("hr_session_pw") || ""; setPwForm({ current: sessionPw, next: "", confirm: "" }); setPwError(""); setShowChangePw(true); }}
+                onClick={() => { const sessionPw = localStorage.getItem("hr_session_pw") || ""; setPwForm({ current: sessionPw, next: "", confirm: "" }); setPwError(""); setShowChangePw(true); }}
               >
                 <KeyRound size={14} />
                 <span>{t.prof_change_password || "Change Password"}</span>

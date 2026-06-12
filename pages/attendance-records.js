@@ -178,14 +178,14 @@ export default function AttendanceRecords() {
           <select
             value={selMonth}
             onChange={e => setSelMonth(Number(e.target.value))}
-            className="att-date-input form-btn-cancel"
+            className="att-date-input form-btn-cancel att-date-input--active"
           >
             {monthNames.map((m, i) => <option key={i} value={i}>{m}</option>)}
           </select>
           <select
             value={selYear}
             onChange={e => setSelYear(Number(e.target.value))}
-            className="att-date-input form-btn-cancel"
+            className="att-date-input form-btn-cancel att-date-input--active"
           >
             {years.map(y => <option key={y} value={y}>{y}</option>)}
           </select>

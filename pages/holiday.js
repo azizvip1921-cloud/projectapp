@@ -17,8 +17,9 @@ function getInitials(name = "") {
 
 function formatDate(dateStr) {
   if (!dateStr) return "";
-  const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+  const plain = typeof dateStr === "string" ? dateStr.slice(0, 10) : new Date(dateStr).toISOString().slice(0, 10);
+  const [year, month, day] = plain.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
 }
 
 // ── Holiday Modal ────────────────────────────────────────────────────────────

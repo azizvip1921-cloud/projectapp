@@ -1,13 +1,12 @@
 import data from "@/lib/data";
+import { requireAuth } from "@/lib/requireAuth";
 
 export default async function handler(req, res) {
+  const session = await requireAuth(req, res);
+  if (!session) return;
+
   if (req.method === "GET") {
     try {
-
-      // دڵنیابوون لەوەی ستوونی status بتوانێت 'On Leave' هەڵبگرێت
-      try {
-        await data.query(`ALTER TABLE attendance MODIFY COLUMN status VARCHAR(20) NOT NULL DEFAULT 'Present'`);
-      } catch (_) {}
 
       // کارمەندی مۆڵەتی چالاکی هەیە → On Leave
       try {

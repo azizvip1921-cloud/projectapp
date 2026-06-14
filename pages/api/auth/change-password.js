@@ -1,15 +1,20 @@
 import data from "@/lib/data";
 import bcrypt from "bcryptjs";
+import { requireAuth } from "@/lib/requireAuth";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
-  const { id, source, current, next } = req.body;
-  if (!id || !current || !next) return res.status(400).json({ error: "missing_fields" });
+  const session = await requireAuth(req, res);
+  if (!session) return;
+
+  // id and source come from the validated session, not from the client
+  const { user_id: id, user_source: source } = session;
+  const { current, next } = req.body;
+  if (!current || !next) return res.status(400).json({ error: "missing_fields" });
 
   try {
     if (source === "system") {
-      // System user — bcrypt password in users table
       const [rows] = await data.query("SELECT password FROM users WHERE id = ? LIMIT 1", [id]);
       if (!rows || rows.length === 0) return res.status(404).json({ error: "not_found" });
       const match = await bcrypt.compare(current, rows[0].password);

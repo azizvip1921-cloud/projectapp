@@ -1,6 +1,10 @@
 import data from "@/lib/data";
+import { requireAuth } from "@/lib/requireAuth";
 
 export default async function handler(req, res) {
+    const session = await requireAuth(req, res);
+    if (!session) return;
+
     const { id } = req.query;
 
     if (req.method === 'GET') {
@@ -10,7 +14,7 @@ export default async function handler(req, res) {
             res.setHeader('Cache-Control', 'no-store, must-revalidate');
             res.setHeader('Pragma', 'no-cache');
             res.setHeader('Expires', '0');
-            
+
             if (rows && rows.length > 0) {
                 res.status(200).json(rows[0]);
             } else {
@@ -28,12 +32,13 @@ export default async function handler(req, res) {
             });
         }
     }
-    // PUT for UPDATE
     else if (req.method === 'PUT') {
         try {
             const { employee_name, number, email, type_of_job, department, salary, status, contract_type, gender, image, city, hire_date, bio, date_of_birth, work_start, work_end } = req.body;
 
-            console.log('Received update data:', { employee_name, number, email, type_of_job, department, salary, status, contract_type, gender, image: image ? 'has image' : 'no image', city, hire_date, bio });
+            // Get old name before update for cascade
+            const [oldRows] = await data.query('SELECT employee_name FROM employee WHERE id = ?', [id]);
+            const oldName = oldRows[0]?.employee_name;
 
             await data.query(
                 `UPDATE employee
@@ -74,7 +79,20 @@ export default async function handler(req, res) {
                     id
                 ]
             );
-            
+
+            // Cascade name change to all related tables
+            if (oldName && employee_name && oldName !== employee_name) {
+                await Promise.all([
+                    data.query("UPDATE contracts SET employee_name = ? WHERE employee_name = ?", [employee_name, oldName]),
+                    data.query("UPDATE leaves SET employee_name = ? WHERE employee_name = ?", [employee_name, oldName]),
+                    data.query("UPDATE attendance SET employee_name = ? WHERE employee_name = ?", [employee_name, oldName]),
+                    data.query("UPDATE payroll SET employee_name = ? WHERE employee_name = ?", [employee_name, oldName]),
+                    data.query("UPDATE face_descriptors SET employee_name = ? WHERE employee_name = ?", [employee_name, oldName]),
+                    data.query("UPDATE expenses SET employee_name = ? WHERE employee_name = ?", [employee_name, oldName]),
+                    data.query("UPDATE requests SET employee_name = ? WHERE employee_name = ?", [employee_name, oldName]),
+                ]);
+            }
+
             res.status(200).json({
                 success: true,
                 message: 'employee updated successfully'
@@ -99,7 +117,6 @@ export default async function handler(req, res) {
     }
     else if (req.method === 'DELETE') {
         try {
-            // Get employee_name before deleting so we can remove their face descriptor
             const [rows] = await data.query('SELECT employee_name FROM employee WHERE id = ?', [id]);
             if (rows.length === 0) {
                 return res.status(404).json({ success: false, message: 'Employee not found' });
@@ -107,8 +124,6 @@ export default async function handler(req, res) {
             const { employee_name } = rows[0];
 
             await data.query('DELETE FROM employee WHERE id = ?', [id]);
-
-            // Also delete their face descriptor if one exists
             await data.query('DELETE FROM face_descriptors WHERE employee_name = ?', [employee_name]);
 
             res.status(200).json({

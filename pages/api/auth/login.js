@@ -29,7 +29,6 @@ export default async function handler(req, res) {
 
   try {
     // 1. Check system users table first (by email or name)
-    await data.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS employee_id INT DEFAULT NULL").catch(() => {});
     const [sysRows] = await data.query(
       "SELECT id, name, email, role, password, employee_id FROM users WHERE email = ? OR LOWER(TRIM(name)) = LOWER(TRIM(?)) LIMIT 1",
       [username.trim(), username.trim()]
@@ -47,9 +46,6 @@ export default async function handler(req, res) {
     }
 
     // 2. Fall back to employee table (HR Manager legacy login)
-    try {
-      await data.query("ALTER TABLE employee ADD COLUMN password VARCHAR(255) DEFAULT NULL");
-    } catch (_) {}
 
     const [rows] = await data.query(
       "SELECT id, employee_name, type_of_job, password, image FROM employee WHERE LOWER(TRIM(employee_name)) = LOWER(TRIM(?)) AND type_of_job = 'HR Manager' LIMIT 1",

@@ -1,6 +1,10 @@
 import data from "@/lib/data";
+import { requireAuth } from "@/lib/requireAuth";
 
 export default  async function handler(req,res){
+  const session = await requireAuth(req, res);
+  if (!session) return;
+
     try{
         const[rows]= await data.query("SELECT 1 ");
         res.status(200).json({message:"DB connection syccessful", rows});

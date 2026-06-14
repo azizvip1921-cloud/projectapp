@@ -1,4 +1,5 @@
 import data from "@/lib/data";
+import { requireAuth } from "@/lib/requireAuth";
 
 // Euclidean distance between two 128-D descriptors
 function euclideanDist(a, b) {
@@ -6,6 +7,9 @@ function euclideanDist(a, b) {
 }
 
 export default async function handler(req, res) {
+  const session = await requireAuth(req, res);
+  if (!session) return;
+
   if (req.method === "GET") {
     // Return all registered employees (names only, no descriptors for security)
     try {

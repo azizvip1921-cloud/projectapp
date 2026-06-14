@@ -1,10 +1,14 @@
 import data from "@/lib/data";
 import fs from "fs";
 import path from "path";
+import { requireAuth } from "@/lib/requireAuth";
 
 export const config = { api: { bodyParser: { sizeLimit: "25mb" } } };
 
 export default async function handler(req, res) {
+  const session = await requireAuth(req, res);
+  if (!session) return;
+
   if (req.method === "GET") {
     try {
       const [rows] = await data.query("SELECT * FROM documents ORDER BY date DESC");

@@ -26,10 +26,15 @@ export default async function handler(req, res) {
         [name, employee, dept || null, type || "PDF", size || null, date]
       );
       if (fileData && fileExt) {
+        const allowedExts = ["pdf", "doc", "docx", "xls", "xlsx", "jpg", "jpeg", "png", "gif", "webp"];
+        if (!allowedExts.includes(fileExt.toLowerCase())) {
+          return res.status(400).json({ success: false, message: "file type not allowed" });
+        }
+        const safeExt = fileExt.toLowerCase();
         const uploadsDir = path.join(process.cwd(), "public", "uploads", "docs");
         if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
         const buffer = Buffer.from(fileData, "base64");
-        fs.writeFileSync(path.join(uploadsDir, `${result.insertId}.${fileExt}`), buffer);
+        fs.writeFileSync(path.join(uploadsDir, `${result.insertId}.${safeExt}`), buffer);
       }
       res.status(200).json({ success: true, id: result.insertId });
     } catch (error) {

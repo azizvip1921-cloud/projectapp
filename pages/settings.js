@@ -126,8 +126,6 @@ export default function SettingsPage() {
     const saved = localStorage.getItem("company_info");
     if (saved) setCompany(JSON.parse(saved));
 
-    const sessionPw = localStorage.getItem("hr_session_pw") || "";
-    if (sessionPw) setPw(p => ({ ...p, current: sessionPw }));
 
     window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); setDeferredPrompt(e); });
     window.addEventListener("appinstalled", () => setPwaInstalled(true));
@@ -157,9 +155,8 @@ export default function SettingsPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
-      localStorage.setItem("hr_session_pw", pw.next);
       toast.success(t.set_pw_changed);
-      setPw({ current: pw.next, next: "", confirm: "" });
+      setPw({ current: "", next: "", confirm: "" });
     } catch (e) { toast.error(e.message); }
     finally     { setPwLoading(false); }
   };
@@ -337,6 +334,7 @@ export default function SettingsPage() {
                         value={pw[f.key]}
                         onChange={e => setPw(p => ({ ...p, [f.key]: e.target.value }))}
                         placeholder="••••••••"
+                        autoComplete={f.key === "current" ? "off" : "new-password"}
                         style={canToggle ? { paddingInlineEnd: "2.4rem" } : undefined}
                       />
                       {canToggle && (

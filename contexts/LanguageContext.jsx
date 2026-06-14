@@ -714,6 +714,7 @@ export const translations = {
     set_pwa_hint: "Once installed, works offline on mobile and laptop",
     set_pwa_chrome: "Open in Chrome and use 'Add to Home Screen'",
     set_pwa_done: "App installed!",
+    viewer_no_permission: '"Viewer" cannot add, edit, or delete. Only Admin, Manager, and HR Manager are allowed.',
   },
   ku: {
     dir: "rtl",
@@ -1410,6 +1411,7 @@ export const translations = {
     set_pwa_hint: "کاتێک دامەزراند، بەبێ ئینتەرنێت لە موبایل و لاپتۆپ کاردەکات",
     set_pwa_chrome: "لە Chrome بکەرەوە و 'Add to Home Screen' بەکاربهێنە",
     set_pwa_done: "ئەپ دامەزراوە!",
+    viewer_no_permission: '"Viewer" ناتوانێت زیادبکات، دەستکاری بکات، یان بسڕێتەوە. تەنها Admin، Manager و HR Manager مۆڵەتیان هەیە.',
   },
   ar: {
     dir: "rtl",
@@ -2105,6 +2107,7 @@ export const translations = {
     set_pwa_hint: "بعد التثبيت، يعمل بدون إنترنت على الجوال والحاسوب",
     set_pwa_chrome: "افتحه في Chrome واستخدم 'إضافة إلى الشاشة الرئيسية'",
     set_pwa_done: "تم تثبيت التطبيق!",
+    viewer_no_permission: '"Viewer" لا يمكنه الإضافة أو التعديل أو الحذف. فقط Admin وManager وHR Manager مسموح لهم.',
   },
 };
 

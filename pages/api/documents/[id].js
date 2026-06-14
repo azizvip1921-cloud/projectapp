@@ -19,15 +19,19 @@ export default async function handler(req, res) {
         [name, employee, dept || null, type || "PDF", size || null, date, id]
       );
       if (fileData && fileExt) {
+        const allowedExts = ["pdf", "doc", "docx", "xls", "xlsx", "jpg", "jpeg", "png", "gif", "webp"];
+        if (!allowedExts.includes(fileExt.toLowerCase())) {
+          return res.status(400).json({ success: false, message: "file type not allowed" });
+        }
+        const safeExt = fileExt.toLowerCase();
         const uploadsDir = path.join(process.cwd(), "public", "uploads", "docs");
         if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-        const allExts = ["pdf", "doc", "docx", "xls", "xlsx", "jpg", "jpeg", "png", "gif", "webp", "bin"];
-        for (const ext of allExts) {
+        for (const ext of allowedExts) {
           const oldPath = path.join(uploadsDir, `${id}.${ext}`);
           if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
         }
         const buffer = Buffer.from(fileData, "base64");
-        fs.writeFileSync(path.join(uploadsDir, `${id}.${fileExt}`), buffer);
+        fs.writeFileSync(path.join(uploadsDir, `${id}.${safeExt}`), buffer);
       }
       res.status(200).json({ success: true });
     } catch (error) {

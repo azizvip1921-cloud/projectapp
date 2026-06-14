@@ -18,15 +18,8 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
-    // Only admin system users can create new system users
-    if (session.user_source === "system") {
-      const [adminCheck] = await data.query(
-        "SELECT role FROM users WHERE id = ? LIMIT 1",
-        [session.user_id]
-      );
-      if (!adminCheck.length || adminCheck[0].role !== "admin") {
-        return res.status(403).json({ error: "forbidden" });
-      }
+    if (session.user_source === "system" && !["Admin", "Manager", "HR Manager"].includes(session.role)) {
+      return res.status(403).json({ error: "forbidden" });
     }
 
     try {

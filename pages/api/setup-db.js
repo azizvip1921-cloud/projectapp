@@ -203,7 +203,7 @@ export default async function handler(req, res) {
         \`id\`          INT AUTO_INCREMENT PRIMARY KEY,
         \`name\`        VARCHAR(255) NOT NULL,
         \`email\`       VARCHAR(255) NOT NULL UNIQUE,
-        \`role\`        ENUM('Admin','HR Manager','Employee','Viewer') NOT NULL DEFAULT 'Employee',
+        \`role\`        ENUM('Admin','HR Manager','Manager','Employee','Viewer') NOT NULL DEFAULT 'Employee',
         \`password\`    VARCHAR(255) NOT NULL,
         \`employee_id\` INT DEFAULT NULL,
         \`created_at\`  TIMESTAMP DEFAULT CURRENT_TIMESTAMP

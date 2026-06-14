@@ -21,6 +21,8 @@ export default async function handler(req, res) {
   } else if (req.method === "PUT") {
     try {
       const { day_name, is_working } = req.body;
+      const VALID_DAYS = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday"];
+      if (!VALID_DAYS.includes(day_name)) return res.status(400).json({ error: "invalid_day" });
       const isWorkingVal = is_working ? 1 : 0;
 
       // تۆماری کونەی کراوە داخستن

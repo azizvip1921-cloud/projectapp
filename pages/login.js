@@ -44,7 +44,6 @@ export default function LoginPage() {
       if (res.ok && json.success) {
         localStorage.setItem("hr_auth", "1");
         localStorage.setItem("hr_user", JSON.stringify(json.user));
-        localStorage.setItem("hr_session_pw", password);
         router.replace("/");
       } else {
         if (json.error === "not_found") {
